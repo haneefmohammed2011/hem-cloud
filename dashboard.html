@@ -19,32 +19,22 @@
         .sidebar-active { background: linear-gradient(90deg, var(--hem-blue) 0%, transparent 100%); border-left: 4px solid var(--hem-blue); color: white !important; }
         .mono { font-family: 'Space Mono', monospace; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .page-transition { transition: all 0.3s ease-in-out; }
-        input:focus { border-color: var(--hem-blue) !important; outline: none; }
-        .role-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase; }
-        .rank-10 { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
-        .rank-7 { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid #3b82f6; }
-        .rank-1 { background: rgba(100, 116, 139, 0.1); color: #64748b; border: 1px solid #64748b; }
+        .role-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase; border: 1px solid currentColor; }
+        .rank-10 { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .rank-7 { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .rank-1 { background: rgba(100, 116, 139, 0.1); color: #64748b; }
     </style>
 </head>
 <body class="overflow-hidden">
 
     <div id="auth-gate" class="fixed inset-0 z-[100] bg-[#050a10] flex items-center justify-center p-4">
         <div class="max-w-md w-full glass p-10 rounded-[2.5rem] shadow-2xl text-center">
-            <div class="mb-8">
-                <h2 class="text-4xl font-black tracking-tighter text-white">HEM <span class="text-blue-500">CORE</span></h2>
-                <p class="text-slate-500 text-xs mt-2 mono uppercase tracking-widest">Institutional Access Only</p>
-            </div>
+            <h2 class="text-4xl font-black tracking-tighter text-white mb-2">HEM <span class="text-blue-500">CORE</span></h2>
+            <p class="text-slate-500 text-[10px] mb-8 mono uppercase tracking-widest">Institutional Access Only</p>
             <form id="login-form" class="space-y-4">
-                <div class="text-left">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2 mb-1 block">Work Email</label>
-                    <input type="email" id="email" required class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm" placeholder="name@hemafrica.com">
-                </div>
-                <div class="text-left">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2 mb-1 block">Access Cipher</label>
-                    <input type="password" id="password" required class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm" placeholder="••••••••">
-                </div>
-                <button type="submit" id="auth-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-95">AUTHENTICATE</button>
+                <input type="email" id="email" required class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm" placeholder="Work Email">
+                <input type="password" id="password" required class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm" placeholder="Access Cipher">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-95">AUTHENTICATE</button>
             </form>
             <p id="auth-error" class="mt-4 text-red-500 text-xs hidden"></p>
         </div>
@@ -52,62 +42,61 @@
 
     <div id="main-interface" class="flex h-screen w-full hidden">
         <aside class="w-72 bg-[#08121d] border-r border-white/5 flex flex-col z-20">
-            <div class="p-8"><div class="flex items-center gap-3"><div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white shadow-lg">H</div><h1 class="text-xl font-black tracking-tighter italic">HEM <span class="text-blue-500">CORE</span></h1></div></div>
+            <div class="p-8 flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white">H</div>
+                <h1 class="text-xl font-black tracking-tighter italic">HEM <span class="text-blue-500">CORE</span></h1>
+            </div>
             <nav class="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">
-                <p class="text-[10px] font-bold text-slate-600 uppercase mb-4 px-4 tracking-widest">Intelligence</p>
-                <button onclick="showPage('dashboard')" class="nav-link sidebar-active w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all"><i class="fa-solid fa-house-chimney text-sm"></i> <span class="text-sm font-semibold">Command Center</span></button>
-                <button data-access="7" onclick="showPage('users')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-white transition-all"><i class="fa-solid fa-users-gear text-sm"></i> <span class="text-sm font-semibold">Staff Matrix</span></button>
-                <p class="text-[10px] font-bold text-slate-600 uppercase mt-8 mb-4 px-4 tracking-widest">Platforms</p>
-                <button data-access="5" onclick="showPage('cinexa')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-white transition-all"><i class="fa-solid fa-clapperboard text-sm"></i> <span class="text-sm font-semibold">Cinexa+ CMS</span></button>
+                <button onclick="showPage('dashboard')" class="nav-link sidebar-active w-full flex items-center gap-4 px-4 py-3 rounded-2xl"><i class="fa-solid fa-house-chimney"></i> <span class="text-sm font-semibold">Command Center</span></button>
+                <button data-access="7" onclick="showPage('users')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400"><i class="fa-solid fa-users-gear"></i> <span class="text-sm font-semibold">Staff Matrix</span></button>
+                <button data-access="5" onclick="showPage('cinexa')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400"><i class="fa-solid fa-clapperboard"></i> <span class="text-sm font-semibold">Cinexa+ CMS</span></button>
             </nav>
-            <div class="p-6 bg-[#0a1824] border-t border-white/5">
-                <div class="flex items-center gap-4">
-                    <div id="user-avatar" class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg">H</div>
-                    <div class="flex-1 overflow-hidden"><p id="user-name" class="text-sm font-bold truncate">---</p><p id="user-rank" class="text-[9px] font-bold mono text-blue-400 uppercase">Rank --</p></div>
-                    <button onclick="signOut()" class="text-slate-500 hover:text-red-500"><i class="fa-solid fa-power-off"></i></button>
-                </div>
+            <div class="p-6 bg-[#0a1824] border-t border-white/5 flex items-center gap-4">
+                <div id="user-avatar" class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold">H</div>
+                <div class="flex-1 overflow-hidden"><p id="user-name" class="text-sm font-bold truncate">---</p><p id="user-rank" class="text-[9px] mono text-blue-400 uppercase">Rank --</p></div>
+                <button onclick="signOut()" class="text-slate-500 hover:text-red-500"><i class="fa-solid fa-power-off"></i></button>
             </div>
         </aside>
 
         <main class="flex-1 flex flex-col overflow-hidden relative">
             <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 glass">
                 <h2 id="view-title" class="text-lg font-bold tracking-tight">Executive Overview</h2>
-                <div class="flex items-center gap-6"><div class="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full"><span class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Node: Ilorin Alpha</span></div></div>
+                <div class="flex items-center gap-4"><span class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest px-3 py-1 bg-emerald-500/10 rounded-full">Node: Ilorin Alpha</span></div>
             </header>
 
-            <section id="content-container" class="flex-1 overflow-y-auto p-10 no-scrollbar space-y-8">
+            <section id="content-container" class="flex-1 overflow-y-auto p-10 space-y-8 no-scrollbar">
                 <div id="page-dashboard" class="page-content space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="glass p-6 rounded-3xl"><p class="text-xs font-bold text-slate-500 uppercase">Userbase</p><h3 class="text-3xl font-black mt-2 mono text-white" id="stat-total-users">0</h3></div>
-                        <div class="glass p-6 rounded-3xl border-l-4 border-blue-500"><p class="text-xs font-bold text-slate-500 uppercase">Revenue</p><h3 class="text-3xl font-black mt-2 mono text-blue-500">$12.4M</h3></div>
-                        <div class="glass p-6 rounded-3xl"><p class="text-xs font-bold text-slate-500 uppercase">Latency</p><h3 class="text-3xl font-black mt-2 mono text-emerald-500">14ms</h3></div>
-                        <div class="glass p-6 rounded-3xl"><p class="text-xs font-bold text-slate-500 uppercase">Staff</p><h3 class="text-3xl font-black mt-2 mono text-white" id="stat-staff-count">0</h3></div>
+                        <div class="glass p-6 rounded-3xl"><p class="text-xs font-bold text-slate-500">USERBASE</p><h3 id="stat-users" class="text-3xl font-black mono text-white">0</h3></div>
+                        <div class="glass p-6 rounded-3xl border-l-4 border-blue-500"><p class="text-xs font-bold text-slate-500">REVENUE</p><h3 class="text-3xl font-black mono text-blue-500">$12.4M</h3></div>
+                        <div class="glass p-6 rounded-3xl"><p class="text-xs font-bold text-slate-500">LATENCY</p><h3 class="text-3xl font-black mono text-emerald-500">12ms</h3></div>
+                        <div class="glass p-6 rounded-3xl"><p class="text-xs font-bold text-slate-500">STORAGE</p><h3 class="text-3xl font-black mono text-white">2.4 PB</h3></div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-2 glass p-8 rounded-[2.5rem] h-[400px]"><canvas id="growthChart"></canvas></div>
+                        <div class="lg:col-span-2 glass p-8 rounded-[2.5rem] min-h-[400px]"><canvas id="growthChart"></canvas></div>
                         <div class="glass p-8 rounded-[2.5rem]">
-                            <h4 class="font-bold mb-6 flex items-center gap-2 text-sm"><i class="fa-solid fa-bolt text-yellow-500"></i> Terminal Logs</h4>
-                            <div id="log-container" class="space-y-4 max-h-64 overflow-y-auto no-scrollbar"></div>
+                            <h4 class="font-bold mb-6 flex items-center gap-2 text-sm uppercase tracking-widest text-slate-400"><i class="fa-solid fa-bolt text-yellow-500"></i> Command Logs</h4>
+                            <div id="log-list" class="space-y-4 max-h-64 overflow-y-auto no-scrollbar"></div>
                         </div>
                     </div>
                 </div>
 
                 <div id="page-users" class="page-content hidden space-y-6">
-                    <div class="flex justify-between items-center"><h3 class="text-2xl font-black">Staff Matrix</h3><button onclick="openEnrollModal()" class="bg-blue-600 px-6 py-3 rounded-xl font-bold text-xs">ENROLL OPERATOR</button></div>
-                    <div class="glass rounded-3xl overflow-hidden"><table class="w-full text-left"><thead class="bg-white/5 text-[10px] font-bold text-slate-500 uppercase"><tr><th class="px-8 py-5">Operator</th><th class="px-8 py-5">Rank</th><th class="px-8 py-5">Designation</th><th class="px-8 py-5 text-right">Delete</th></tr></thead><tbody id="staff-table-body" class="text-sm"></tbody></table></div>
+                    <div class="flex justify-between items-center"><h3 class="text-2xl font-black">Staff Matrix</h3><button onclick="openEnrollModal()" class="bg-blue-600 px-6 py-3 rounded-xl font-bold text-xs hover:bg-blue-500">ENROLL OPERATOR</button></div>
+                    <div class="glass rounded-3xl overflow-hidden"><table class="w-full text-left"><thead class="bg-white/5 text-[10px] font-bold text-slate-500 uppercase"><tr><th class="px-8 py-5">Operator</th><th class="px-8 py-5">Designation</th><th class="px-8 py-5">Platform</th><th class="px-8 py-5 text-right">Actions</th></tr></thead><tbody id="staff-table-body" class="text-sm"></tbody></table></div>
                 </div>
 
                 <div id="page-cinexa" class="page-content hidden space-y-6">
-                    <div class="flex justify-between items-center"><h3 class="text-2xl font-black">Cinexa+ Content</h3><button onclick="openMediaModal()" class="bg-white/10 px-6 py-3 rounded-xl font-bold text-xs">UPLOAD MEDIA</button></div>
+                    <div class="flex justify-between items-center"><h3 class="text-2xl font-black">Cinexa+ Studio</h3><button onclick="openMediaModal()" class="bg-white/10 px-6 py-3 rounded-xl font-bold text-xs hover:bg-white/20">ADD MEDIA</button></div>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="media-grid"></div>
                 </div>
             </section>
         </main>
     </div>
 
-    <div id="modal-container" class="fixed inset-0 z-[110] bg-black/90 hidden items-center justify-center p-6 backdrop-blur-sm">
-        <div class="max-w-lg w-full glass p-10 rounded-[2.5rem] relative">
-            <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-500"><i class="fa-solid fa-xmark"></i></button>
+    <div id="modal-container" class="fixed inset-0 z-[110] bg-black/95 hidden items-center justify-center p-6 backdrop-blur-md">
+        <div class="max-w-lg w-full glass p-10 rounded-[3rem] relative">
+            <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             <div id="modal-content"></div>
         </div>
     </div>
@@ -119,17 +108,15 @@
         const auth = firebase.auth();
         let userProfile = null;
 
-        // AUTH LOGIC
         document.getElementById('login-form').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('auth-btn');
-            btn.innerText = "AUTHENTICATING...";
+            const btn = e.target.querySelector('button');
+            btn.innerText = "VERIFYING...";
             try {
                 await auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value);
             } catch (err) {
-                const errEl = document.getElementById('auth-error');
-                errEl.innerText = err.message;
-                errEl.classList.remove('hidden');
+                document.getElementById('auth-error').innerText = "ACCESS REJECTED: " + err.message;
+                document.getElementById('auth-error').classList.remove('hidden');
                 btn.innerText = "AUTHENTICATE";
             }
         };
@@ -137,26 +124,26 @@
         auth.onAuthStateChanged(async (u) => {
             if (u) {
                 const doc = await db.collection("hem_staff").doc(u.uid).get();
-                if (doc.exists) {
-                    userProfile = doc.data(); launchMatrix();
-                } else if (u.email.includes('haneef')) {
-                    userProfile = { displayName: "Haneef Mohammed", accessLevel: 10, email: u.email };
+                if (doc.exists) { userProfile = doc.data(); launchOS(); }
+                else if (u.email.includes('haneef')) {
+                    userProfile = { displayName: "Haneef Mohammed", email: u.email, accessLevel: 10 };
                     await db.collection("hem_staff").doc(u.uid).set(userProfile);
-                    launchMatrix();
-                } else { auth.signOut(); alert("Access Denied."); }
+                    launchOS();
+                } else { auth.signOut(); alert("Unrecognized Identity."); }
             } else {
                 document.getElementById('auth-gate').classList.remove('hidden');
                 document.getElementById('main-interface').classList.add('hidden');
             }
         });
 
-        function launchMatrix() {
+        function launchOS() {
             document.getElementById('auth-gate').classList.add('hidden');
             document.getElementById('main-interface').classList.remove('hidden');
             document.getElementById('user-name').innerText = userProfile.displayName;
-            document.getElementById('user-rank').innerText = `RANK ${userProfile.accessLevel}`;
-            document.getElementById('user-avatar').innerText = userProfile.displayName[0];
-            initCharts(); syncData(); checkPermissions();
+            document.getElementById('user-rank').innerText = `RANK ${userProfile.accessLevel} // CEO`;
+            document.getElementById('user-avatar').innerText = userProfile.displayName[0].toUpperCase();
+            
+            initCharts(); syncData(); checkPermissions(); logEvent("System Handshake", "CEO Authorized from Alpha Node");
         }
 
         function checkPermissions() {
@@ -166,87 +153,102 @@
         }
 
         function syncData() {
-            // Live Stats
-            db.collection("users").onSnapshot(s => document.getElementById('stat-total-users').innerText = s.size.toLocaleString());
-            db.collection("hem_staff").onSnapshot(s => {
-                document.getElementById('stat-staff-count').innerText = s.size;
+            // Live Staff Matrix
+            db.collection("hem_staff").onSnapshot(snap => {
                 const body = document.getElementById('staff-table-body');
                 body.innerHTML = '';
-                s.forEach(doc => {
-                    const data = doc.data();
+                snap.forEach(doc => {
+                    const d = doc.data();
                     body.innerHTML += `<tr class="border-t border-white/5 hover:bg-white/5 transition-all">
-                        <td class="px-8 py-5 font-bold">${data.displayName}</td>
-                        <td class="px-8 py-5"><span class="role-badge ${data.accessLevel >= 10 ? 'rank-10' : 'rank-7'}">RANK ${data.accessLevel}</span></td>
-                        <td class="px-8 py-5 text-slate-500 uppercase mono text-[10px]">Active Node</td>
-                        <td class="px-8 py-5 text-right"><button onclick="deleteDoc('hem_staff','${doc.id}')" class="text-slate-700 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                        <td class="px-8 py-5 font-bold">${d.displayName}<br><span class="text-[10px] text-slate-500 font-normal">${d.email}</span></td>
+                        <td class="px-8 py-5"><span class="role-badge ${d.accessLevel >= 10 ? 'rank-10' : 'rank-7'}">RANK ${d.accessLevel}</span></td>
+                        <td class="px-8 py-5 text-[10px] mono text-blue-500 uppercase tracking-widest">HEM CLOUD // NODE 1</td>
+                        <td class="px-8 py-5 text-right"><button onclick="deleteStaff('${doc.id}')" class="text-slate-700 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button></td>
                     </tr>`;
                 });
             });
 
-            // Cinexa Grid
-            db.collection("cinexa_content").onSnapshot(s => {
+            // Cinexa Media Sync
+            db.collection("cinexa_content").onSnapshot(snap => {
                 const grid = document.getElementById('media-grid');
                 grid.innerHTML = '';
-                s.forEach(doc => {
-                    const data = doc.data();
+                snap.forEach(doc => {
+                    const d = doc.data();
                     grid.innerHTML += `<div class="glass rounded-3xl overflow-hidden group">
                         <div class="h-40 bg-slate-900 flex items-center justify-center text-4xl text-white/10"><i class="fa-solid fa-film"></i></div>
                         <div class="p-6">
-                            <h5 class="font-bold truncate">${data.title}</h5>
-                            <p class="text-[10px] text-blue-500 uppercase font-bold mt-1">${data.category}</p>
-                            <button onclick="deleteDoc('cinexa_content','${doc.id}')" class="mt-4 text-[9px] text-red-500/50 hover:text-red-500 uppercase font-black">Decommission</button>
+                            <h5 class="font-bold truncate text-sm">${d.title}</h5>
+                            <p class="text-[9px] text-blue-500 uppercase font-black mt-1 tracking-tighter">${d.category || 'Institutional Content'}</p>
+                            <button onclick="deleteDoc('cinexa_content','${doc.id}')" class="mt-4 text-[9px] text-red-500/30 hover:text-red-500 uppercase font-bold">Decommission</button>
                         </div>
                     </div>`;
                 });
             });
+
+            db.collection("users").onSnapshot(s => document.getElementById('stat-users').innerText = s.size.toLocaleString());
         }
 
+        function logEvent(action, detail) {
+            const list = document.getElementById('log-list');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const log = document.createElement('div');
+            log.className = "flex gap-4 p-3 rounded-xl bg-white/5 text-[10px] animate-pulse";
+            log.innerHTML = `<span class="mono text-blue-500">${time}</span> <div><p class="font-bold text-white uppercase">${action}</p><p class="text-slate-500">${detail}</p></div>`;
+            list.prepend(log);
+        }
+
+        // --- MODAL ACTIONS ---
         function openEnrollModal() {
             document.getElementById('modal-container').classList.replace('hidden', 'flex');
             document.getElementById('modal-content').innerHTML = `
-                <h3 class="text-2xl font-black mb-6">Enroll Operator</h3>
-                <input id="new-name" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 mb-4" placeholder="Full Name">
-                <input id="new-email" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 mb-4" placeholder="Email">
-                <input id="new-rank" type="number" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 mb-6" placeholder="Rank (1-10)" value="1">
-                <button onclick="commitEnroll()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold">COMMIT TO DATABASE</button>
+                <h3 class="text-2xl font-black mb-2">Enroll Operator</h3>
+                <p class="text-xs text-slate-500 mb-6 uppercase mono tracking-widest">Provisioning Access to Core Infrastructure</p>
+                <input id="en-name" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 mb-4" placeholder="Full Name">
+                <input id="en-email" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 mb-4" placeholder="Institutional Email">
+                <input id="en-rank" type="number" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 mb-6" placeholder="Assigned Rank (1-10)" value="1">
+                <button onclick="commitEnroll()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold hover:bg-blue-500 transition-all">GENERATE CREDENTIALS</button>
             `;
         }
 
         async function commitEnroll() {
-            const data = { displayName: document.getElementById('new-name').value, email: document.getElementById('new-email').value, accessLevel: parseInt(document.getElementById('new-rank').value) };
+            const data = { displayName: document.getElementById('en-name').value, email: document.getElementById('en-email').value, accessLevel: parseInt(document.getElementById('en-rank').value) };
             await db.collection("hem_staff").add(data);
+            logEvent("Security", `New Operator ${data.displayName} Enrolled at Rank ${data.accessLevel}`);
             closeModal();
         }
 
         function openMediaModal() {
             document.getElementById('modal-container').classList.replace('hidden', 'flex');
             document.getElementById('modal-content').innerHTML = `
-                <h3 class="text-2xl font-black mb-6">Publish Media</h3>
-                <input id="m-title" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 mb-4" placeholder="Movie Title">
-                <input id="m-cat" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 mb-6" placeholder="Category">
-                <button onclick="commitMedia()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold">PUBLISH LIVE</button>
+                <h3 class="text-2xl font-black mb-6">Publish to Cinexa+</h3>
+                <input id="m-title" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 mb-4" placeholder="Show Title">
+                <input id="m-cat" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 mb-6" placeholder="Genre / Category">
+                <button onclick="commitMedia()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold">DEPLOY CONTENT</button>
             `;
         }
 
         async function commitMedia() {
-            await db.collection("cinexa_content").add({ title: document.getElementById('m-title').value, category: document.getElementById('m-cat').value, timestamp: new Date() });
+            const title = document.getElementById('m-title').value;
+            await db.collection("cinexa_content").add({ title: title, category: document.getElementById('m-cat').value, timestamp: new Date() });
+            logEvent("Content", `New Title "${title}" published to Cinexa+ Node`);
             closeModal();
         }
-
-        async function deleteDoc(col, id) { if(confirm("Confirm Deletion?")) await db.collection(col).doc(id).delete(); }
 
         function showPage(id) {
             document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
             document.getElementById(`page-${id}`).classList.remove('hidden');
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('sidebar-active'));
             event.currentTarget.classList.add('sidebar-active');
+            document.getElementById('view-title').innerText = id.charAt(0).toUpperCase() + id.slice(1) + " Overview";
         }
 
         function initCharts() {
             const ctx = document.getElementById('growthChart').getContext('2d');
-            new Chart(ctx, { type: 'line', data: { labels: ['W1', 'W2', 'W3', 'W4'], datasets: [{ data: [12, 19, 35, 60], borderColor: '#3B82F6', tension: 0.4, fill: true, backgroundColor: 'rgba(59,130,246,0.05)', pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#444' } } } } });
+            new Chart(ctx, { type: 'line', data: { labels: ['01', '02', '03', '04', '05', '06'], datasets: [{ data: [30, 45, 38, 70, 65, 95], borderColor: '#3B82F6', tension: 0.4, fill: true, backgroundColor: 'rgba(59,130,246,0.05)', pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#334155', font: { size: 10 } } } } } });
         }
 
+        async function deleteDoc(col, id) { if(confirm("Confirm Deletion?")) await db.collection(col).doc(id).delete(); }
+        async function deleteStaff(id) { if(confirm("Revoke Access?")) await db.collection("hem_staff").doc(id).delete(); }
         function closeModal() { document.getElementById('modal-container').classList.replace('flex', 'hidden'); }
         function signOut() { auth.signOut(); }
     </script>
