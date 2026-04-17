@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.E.M. CORE | Institutional OS</title>
-    
+    <title>H.E.M. CORE | Intelligence OS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -26,137 +24,100 @@
         .nav-label { font-size: 9px; color: #444; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 10px; text-transform: uppercase; }
         .nav-item { 
             padding: 10px 15px; color: #64748b; font-size: 13px; font-weight: 600;
-            border-radius: 8px; margin-bottom: 2px; display: flex; align-items: center; gap: 12px; transition: 0.2s;
+            border-radius: 8px; margin-bottom: 2px; display: flex; align-items: center; gap: 12px; transition: 0.2s; cursor: pointer;
         }
         .nav-item:hover, .active-nav { background: var(--panel); color: white; border-left: 3px solid var(--accent); }
 
-        /* --- MAIN INTERFACE --- */
+        /* --- MAIN --- */
         main { flex: 1; padding: 30px; overflow-y: auto; background: radial-gradient(circle at top right, #0a1128, #000); }
         .view { display: none; animation: fadeIn 0.3s ease; }
         .view.active { display: block; }
 
-        /* --- COMPONENTS --- */
-        .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(10px); }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-val { font-size: 22px; font-weight: 900; font-family: 'Space Mono'; color: var(--neon); }
+        /* --- ELEMENTS --- */
+        .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .btn-destructive { background: rgba(255, 59, 48, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 800; }
+        .rank-badge { font-family: 'Space Mono'; font-size: 10px; padding: 2px 8px; border-radius: 4px; border: 1px solid; }
         
-        /* Directory Tracking Styles */
-        .tracking-meta { font-size: 10px; font-family: 'Space Mono'; color: #444; }
-        .status-node { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .node-active { background: var(--neon); box-shadow: 0 0 10px var(--neon); }
-
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; font-size: 10px; color: #444; padding: 10px; border-bottom: 1px solid var(--border); }
-        td { padding: 12px 10px; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.02); }
-
-        input, select, textarea { background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 10px; color: white; border-radius: 6px; width: 100%; outline: none; }
-        .btn-core { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 800; width: 100%; transition: 0.2s; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* SECURITY OVERRIDE CLASS */
+        .restricted { display: none !important; }
     </style>
 </head>
 <body>
 
     <aside>
         <div style="margin-bottom: 30px;">
-            <h2 style="font-weight: 900; letter-spacing: 2px;">HEM <span style="color:var(--accent)">CORE</span></h2>
-            <p style="font-size: 8px; color: #444; font-family: 'Space Mono';">SECURITY PROTOCOL: ACTIVE</p>
+            <h2 style="font-weight: 900;">HEM <span style="color:var(--accent)">CORE</span></h2>
+            <p style="font-size: 8px; color: #444;">CONSTITUTIONAL ENGINE V4</p>
         </div>
 
-        <div class="nav-group" id="group-intelligence">
-            <p class="nav-label">Intelligence</p>
-            <div class="nav-item active-nav" onclick="showView('overview', this)"><i class="fa-solid fa-gauge-high"></i> Executive Overview</div>
-            <div class="nav-item" id="nav-directory" onclick="showView('directory', this)"><i class="fa-solid fa-address-book"></i> User Directory</div>
+        <div class="nav-group">
+            <p class="nav-label">General</p>
+            <div class="nav-item active-nav" data-min-rank="1" onclick="showView('overview', this)"><i class="fa-solid fa-gauge"></i> Overview</div>
+            <div class="nav-item" data-min-rank="2" onclick="showView('analytics', this)"><i class="fa-solid fa-chart-pie"></i> Analytics</div>
         </div>
 
-        <div class="nav-group" id="group-ops">
-            <p class="nav-label">Operations</p>
-            <div class="nav-item" onclick="showView('calendar', this)"><i class="fa-solid fa-calendar-days"></i> Institutional Calendar</div>
-            <div class="nav-item" onclick="showView('tasks', this)"><i class="fa-solid fa-list-check"></i> Task Board</div>
-            <div class="nav-item" onclick="showView('announcements', this)"><i class="fa-solid fa-bullhorn"></i> Announcements</div>
+        <div class="nav-group">
+            <p class="nav-label">Platform Mgmt</p>
+            <div class="nav-item" data-min-rank="3" onclick="showView('support', this)"><i class="fa-solid fa-headset"></i> Support Desk</div>
+            <div class="nav-item" data-min-rank="4" onclick="showView('moderation', this)"><i class="fa-solid fa-shield"></i> Moderation</div>
+            <div class="nav-item" data-min-rank="5" onclick="showView('cinexa', this)"><i class="fa-solid fa-play"></i> Cinexa+ CMS</div>
+            <div class="nav-item" data-min-rank="6" onclick="showView('cloud', this)"><i class="fa-solid fa-cloud"></i> HEM Cloud</div>
         </div>
 
-        <div class="nav-group" id="group-governance">
+        <div class="nav-group">
             <p class="nav-label">Governance</p>
-            <div class="nav-item" id="nav-approvals" onclick="showView('approvals', this)"><i class="fa-solid fa-signature"></i> Approval Queue</div>
-            <div class="nav-item" id="nav-billing" onclick="showView('billing', this)"><i class="fa-solid fa-receipt"></i> Financial Audit</div>
+            <div class="nav-item" data-min-rank="7" onclick="showView('directory', this)"><i class="fa-solid fa-users"></i> User Directory</div>
+            <div class="nav-item" data-min-rank="9" onclick="showView('financials', this)"><i class="fa-solid fa-sack-dollar"></i> Financials</div>
+            <div class="nav-item" data-min-rank="10" onclick="showView('system', this)"><i class="fa-solid fa-microchip"></i> System Root</div>
         </div>
 
         <div style="margin-top: auto; padding: 15px; border: 1px solid var(--border); border-radius: 10px;">
-            <p style="font-size: 9px; color: #444;">IDENTIFIED OPERATOR</p>
-            <p style="font-size: 12px; font-weight: 800;">H. Mohammed</p>
-            <p id="rank-display" style="font-size: 10px; color: var(--neon); font-family: 'Space Mono';">RANK 10 // CEO</p>
+            <p style="font-size: 9px; color: #444;">OPERATOR</p>
+            <p style="font-size: 12px; font-weight: 800;">Haneef Mohammed</p>
+            <p id="op-rank" style="font-size: 10px; color: var(--neon); font-family: 'Space Mono';">RANK 10 // CEO</p>
         </div>
     </aside>
 
     <main>
-        <div id="view-overview" class="view active">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h1>Executive <span style="color:var(--accent)">Overview</span></h1>
-                <div id="timer" style="font-family:'Space Mono'; color:var(--accent)">00:00:00</div>
-            </div>
-
-            <div class="stats-grid">
-                <div class="card"><p style="font-size: 9px; color: #444;">ACTIVE NODES</p><div class="stat-val" id="node-count">14</div></div>
-                <div class="stat-card card"><p style="font-size: 9px; color: #444;">MTD REVENUE</p><div class="stat-val" style="color:var(--accent)">$12,450.00</div></div>
-                <div class="card"><p style="font-size: 9px; color: #444;">PENDING APPROVALS</p><div class="stat-val" id="approval-count" style="color:var(--warning)">3</div></div>
-                <div class="card"><p style="font-size: 9px; color: #444;">SYSTEM HEALTH</p><div class="stat-val">99.9%</div></div>
-            </div>
-
-            <div class="card">
-                <canvas id="mainChart" height="250"></canvas>
+        <div id="view-system" class="view" data-min-rank="10">
+            <h1>System <span style="color:var(--danger)">Root Access</span></h1>
+            <div class="card" style="margin-top:20px;">
+                <p style="margin-bottom:20px; color:#64748b;">Supreme Control: These actions bypass all board protocols.</p>
+                <button class="btn-destructive" onclick="emergencyShutdown()">DISABLE ALL PLATFORMS</button>
+                <button class="btn-destructive" onclick="wipeData()">PURGE PLATFORM DATA</button>
             </div>
         </div>
 
-        <div id="view-directory" class="view">
-            <h1 style="margin-bottom: 20px;">User <span style="color:var(--accent)">Directory</span></h1>
+        <div id="view-financials" class="view" data-min-rank="9">
+            <h1>Fiscal <span style="color:var(--accent)">Intelligence</span></h1>
+            <div class="card" style="margin-top:20px;">
+                <p>Investor Dashboard & Revenue Streams</p>
+                <h2 style="font-family:'Space Mono'; margin-top:10px;">$124,500.00 <span style="font-size:12px; color:var(--neon)">+12%</span></h2>
+            </div>
+        </div>
+
+        <div id="view-directory" class="view" data-min-rank="7">
+            <h1>Staff <span style="color:var(--accent)">Directory</span></h1>
             <div class="card">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>IDENTIFIER</th>
-                            <th>NODE ACCESS</th>
-                            <th>LAST LOGIN / IP</th>
-                            <th>DEVICE AGENT</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="directory-body">
-                        </tbody>
+                    <thead><tr><th>NAME</th><th>RANK</th><th>ACTIONS</th></tr></thead>
+                    <tbody id="user-list"></tbody>
                 </table>
             </div>
         </div>
 
-        <div id="view-approvals" class="view">
-            <h1>Approval <span style="color:var(--warning)">Queue</span></h1>
+        <div id="view-overview" class="view active" data-min-rank="1">
+            <h1>Executive <span style="color:var(--accent)">Portal</span></h1>
             <div class="card" style="margin-top:20px;">
-                <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <p style="font-weight:800;">Budget Increase: Pinglo Servers</p>
-                        <p style="font-size:11px; color:#64748b;">Requested by: Ops Manager (Rank 6)</p>
-                    </div>
-                    <button class="btn-core" style="width:auto; padding:8px 20px; background:var(--neon); color:black;">APPROVE</button>
-                </div>
+                <p>Welcome back, CEO. System nodes are currently nominal.</p>
             </div>
         </div>
-
-        <div id="view-announcements" class="view">
-            <h1>Global <span style="color:var(--accent)">Announcements</span></h1>
-            <div class="card" style="margin-top:20px; max-width:600px;">
-                <label>Target Platforms</label>
-                <select style="margin-bottom:15px;"><option>All Platforms</option><option>Pinglo Only</option><option>Cinexa+ Only</option></select>
-                <label>Broadcast Message</label>
-                <textarea rows="4" placeholder="Enter system announcement..."></textarea>
-                <button class="btn-core" style="margin-top:15px;" onclick="parent.alert('core.hemafrica says: Announcement Broadcasted.')">PUSH TO NODES</button>
-            </div>
-        </div>
-
-        <div id="view-calendar" class="view"><h1>Institutional <span style="color:var(--accent)">Calendar</span></h1><div class="card">Calendar Module Initializing...</div></div>
-        <div id="view-tasks" class="view"><h1>Task <span style="color:var(--accent)">Command</span></h1><div class="card">Loading Active Tasks...</div></div>
     </main>
 
     <script>
-        // --- CONFIGURATION ---
+        // --- DATA HUB ---
         const firebaseConfig = {
             apiKey: "AIzaSyACO46sTJQffwsQJfFN9cqYa_oDKG14AfQ",
             authDomain: "hem-platform.firebaseapp.com",
@@ -166,17 +127,32 @@
             appId: "1:846707696620:web:59676e4223dcbe6c9816c9"
         };
 
-        const USER_RANK = 10; // Current Operator Rank
+        // THE SUPREME CONFIG
+        let currentOperatorRank = 10; // This should be fetched from Firebase/Auth
 
-        // --- SECURITY ENGINE ---
-        function checkPermissions() {
-            if (USER_RANK < 10) {
-                document.getElementById('nav-approvals').style.display = 'none';
-                document.getElementById('nav-billing').style.display = 'none';
-            }
-            if (USER_RANK < 7) {
-                document.getElementById('group-governance').style.display = 'none';
-            }
+        // --- THE PERMISSION ENGINE ---
+        function applySecurity() {
+            console.log("HEM_CORE: Initializing Security Check...");
+            
+            // 1. Check every element with a 'data-min-rank' attribute
+            document.querySelectorAll('[data-min-rank]').forEach(el => {
+                const required = parseInt(el.getAttribute('data-min-rank'));
+                
+                if (currentOperatorRank < required) {
+                    el.classList.add('restricted'); // Hide elements the user isn't allowed to see
+                } else {
+                    el.classList.remove('restricted'); // Show elements they are cleared for
+                }
+            });
+
+            // 2. Update Rank UI
+            const rankLabel = document.getElementById('op-rank');
+            rankLabel.innerText = `RANK ${currentOperatorRank} // ${getRankName(currentOperatorRank)}`;
+        }
+
+        function getRankName(r) {
+            const names = {10:"CEO", 9:"BOARD", 8:"SUPER ADMIN", 7:"ADMIN", 6:"OPS MGR", 5:"CONTENT", 4:"MODERATOR", 3:"SUPPORT", 2:"ANALYST", 1:"INTERN"};
+            return names[r] || "GUEST";
         }
 
         function showView(viewId, el) {
@@ -186,71 +162,37 @@
             el.classList.add('active-nav');
         }
 
-        // --- DATA ENGINE ---
         window.onload = () => {
             if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
-            checkPermissions();
-
-            // Sync User Directory
-            db.collection("users").onSnapshot(snap => {
-                const tbody = document.getElementById('directory-body');
-                tbody.innerHTML = '';
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    const isHighRank = u.accessLevel >= 9;
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>
-                                <div style="font-weight:800;">${u.displayName || 'Anonymous'}</div>
-                                <div style="font-size:10px; color:#444;">${u.email}</div>
-                            </td>
-                            <td><span class="status-node ${isHighRank ? 'node-active' : ''}"></span> RANK ${u.accessLevel || 1}</td>
-                            <td>
-                                <div class="tracking-meta">${u.lastLogin || 'Never'}</div>
-                                <div class="tracking-meta" style="color:var(--accent)">${u.lastIp || '192.168.1.1'}</div>
-                            </td>
-                            <td><div class="tracking-meta">${u.deviceAgent || 'Windows 11 / Chrome'}</div></td>
-                            <td><button onclick="editUser('${doc.id}')" style="background:none; border:1px solid #222; color:white; padding:5px; cursor:pointer;">MANAGE</button></td>
-                        </tr>
-                    `;
+            applySecurity(); // Trigger the lockdown
+            
+            // Logic for Rank 7+ (Directory Fetching)
+            if (currentOperatorRank >= 7) {
+                firebase.firestore().collection("users").onSnapshot(snap => {
+                    const list = document.getElementById('user-list');
+                    list.innerHTML = '';
+                    snap.forEach(doc => {
+                        const u = doc.data();
+                        list.innerHTML += `
+                            <tr>
+                                <td>${u.displayName || 'Operator'}</td>
+                                <td>RANK ${u.accessLevel}</td>
+                                <td>
+                                    ${currentOperatorRank >= 8 ? `<button onclick="promote('${doc.id}')">EDIT</button>` : ''}
+                                    ${currentOperatorRank === 10 ? `<button class="btn-destructive">PURGE</button>` : ''}
+                                </td>
+                            </tr>
+                        `;
+                    });
                 });
-            });
-
-            // Initialize Charts
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Active Nodes',
-                        data: [12, 14, 13, 15, 14, 18, 14],
-                        borderColor: '#0066ff',
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#444' } } }
-                }
-            });
-
-            // Live Clock
-            setInterval(() => {
-                document.getElementById('timer').innerText = new Date().toLocaleTimeString();
-            }, 1000);
+            }
         };
 
-        function editUser(uid) {
-            const level = prompt("core.hemafrica says:\n\nEnter New Rank Level (1-10):");
-            if(level) {
-                firebase.firestore().collection("users").doc(uid).update({accessLevel: parseInt(level)});
-            }
+        // SUPREME COMMANDS
+        function promote(uid) {
+            if (currentOperatorRank < 8) return alert("H.E.M. CORE: Authority insufficient.");
+            const n = prompt("New Rank (1-10):");
+            if(n) firebase.firestore().collection("users").doc(uid).update({accessLevel: parseInt(n)});
         }
     </script>
 </body>
