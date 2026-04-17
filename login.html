@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <title>HMN | Root Authorization</title>
+    <style>
+        body { background: #050505; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .auth-container { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .input-field { background: #111; border: 1px solid #222; transition: 0.3s; }
+        .input-field:focus { border-color: #0078d4; box-shadow: 0 0 10px rgba(0, 120, 212, 0.2); outline: none; }
+        .loading-bar { height: 2px; width: 0%; background: #0078d4; transition: width 0.5s; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="auth-container w-full max-w-[400px] p-12 rounded-3xl shadow-2xl">
+        <div class="mb-10">
+            <div class="flex items-center gap-2 mb-2">
+                <div class="w-3 h-3 bg-blue-600 rounded-sm"></div>
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Infrastructure Protocol</span>
+            </div>
+            <h1 class="text-3xl font-bold tracking-tighter">Sign in</h1>
+            <p class="text-xs text-slate-400 mt-1">Connect to H.E.M. Cloud Node</p>
+        </div>
+
+        <div id="login-form" class="space-y-5">
+            <div>
+                <label class="text-[9px] font-bold uppercase text-slate-500 ml-1">Identity</label>
+                <input id="email" type="email" value="haneef@hemafrica.com" class="input-field w-full p-4 rounded-xl text-sm mt-1" placeholder="Email Address">
+            </div>
+            <div>
+                <label class="text-[9px] font-bold uppercase text-slate-500 ml-1">Access Key</label>
+                <input id="password" type="password" class="input-field w-full p-4 rounded-xl text-sm mt-1" placeholder="••••••••">
+            </div>
+            
+            <div class="pt-4">
+                <div class="loading-bar mb-4" id="progress"></div>
+                <button onclick="rootProvision()" id="btn" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-900/20">
+                    Next
+                </button>
+            </div>
+        </div>
+
+        <div id="feedback" class="mt-6 text-center text-[10px] font-bold uppercase tracking-widest text-slate-600"></div>
+    </div>
+
+   <script>
+const firebaseConfig = {
+    apiKey: "AIzaSyDlhFnMp9AKuv9HS-gbON5d3k6I3YePOXA",
+    authDomain: "hem-platform.firebaseapp.com",
+    projectId: "hem-platform",
+    storageBucket: "hem-platform.firebasestorage.app",
+    messagingSenderId: "846707696620",
+    appId: "1:846707696620:web:59676e4223dcbe6c9816c9"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+async function rootProvision() {
+    const btn = document.getElementById('btn');
+    const feedback = document.getElementById('feedback');
+    const progress = document.getElementById('progress');
+
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('password').value;
+
+    btn.disabled = true;
+    btn.innerText = "VERIFYING...";
+    progress.style.width = "40%";
+    feedback.innerText = "Connecting H.E.M Core...";
+
+    try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, pass);
+        const user = userCredential.user;
+
+        progress.style.width = "70%";
+
+        // 🔐 SECURITY CHECK (VERY IMPORTANT)
+        const staffDoc = await db.collection("hem_staff").doc(user.uid).get();
+
+        if (!staffDoc.exists) {
+            throw new Error("No staff record found");
+        }
+
+        const data = staffDoc.data();
+
+        if (data.accessLevel < 10) {
+            throw new Error("Insufficient clearance level");
+        }
+
+        // Update last access
+        await db.collection("hem_staff").doc(user.uid).set({
+            last_access: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        progress.style.width = "100%";
+        feedback.innerText = "ACCESS GRANTED";
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 800);
+
+    } catch (e) {
+        btn.disabled = false;
+        btn.innerText = "NEXT";
+        progress.style.width = "0%";
+        feedback.innerText = e.message;
+    }
+}
+</script>
+</body>
+</html>
