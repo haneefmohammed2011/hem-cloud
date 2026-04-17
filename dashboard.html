@@ -3,201 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.E.M. CORE | OS-v2</title>
+    <title>H.E.M. CORE | Institutional OS</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-firestore-compat.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        :root {
-            --bg-deep: #020617;
-            --accent-blue: #3b82f6;
-            --glass-border: rgba(255, 255, 255, 0.08);
-        }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-deep); color: #f8fafc; }
-        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); }
-        .sidebar-item:hover, .sidebar-active { background: rgba(59, 130, 246, 0.1); border-right: 3px solid var(--accent-blue); color: white; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        
-        /* Custom Calendar Styling */
-        .fc { --fc-border-color: rgba(255,255,255,0.05); }
-        .fc-toolbar-title { font-size: 1rem !important; font-weight: 800; }
-        .fc-daygrid-day:hover { background: rgba(255,255,255,0.02); cursor: pointer; }
+        :root { --bg: #020617; --accent: #3b82f6; --glass: rgba(15, 23, 42, 0.7); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; overflow: hidden; }
+        .glass { background: var(--glass); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .sidebar-btn:hover { background: rgba(59, 130, 246, 0.1); border-right: 3px solid var(--accent); }
+        .sidebar-active { background: rgba(59, 130, 246, 0.15); border-right: 3px solid var(--accent); color: white; }
     </style>
 </head>
-<body class="h-screen flex overflow-hidden">
+<body class="flex h-screen w-screen">
 
-    <aside class="w-64 border-r border-white/5 flex flex-col glass-panel z-50">
-        <div class="p-8 flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
-                <i class="fa-solid fa-layer-group text-white"></i>
-            </div>
-            <div>
-                <h1 class="font-extrabold tracking-tighter text-lg leading-none">H.E.M. <span class="text-blue-500">CORE</span></h1>
-                <p class="text-[8px] mono text-slate-500 uppercase tracking-widest mt-1">Admin OS v2.4</p>
-            </div>
+    <aside class="w-64 glass border-r border-white/5 flex flex-col z-50">
+        <div class="p-8 flex flex-col gap-2">
+            <h1 class="font-extrabold text-xl tracking-tighter italic">H.E.M. <span class="text-blue-500">GROUP</span></h1>
+            <span class="text-[9px] mono text-slate-500 uppercase tracking-widest">Sovereign Node v10</span>
         </div>
 
-        <nav class="flex-1 px-4 space-y-1 overflow-y-auto pt-4">
-            <p class="text-[10px] font-bold text-slate-600 uppercase mb-2 px-4">HQ Command</p>
-            <button onclick="showSection('dashboard')" class="sidebar-item sidebar-active w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-400 transition-all">
-                <i class="fa-solid fa-gauge-high"></i> <span class="text-sm font-semibold">Intelligence</span>
+        <nav class="flex-1 px-4 space-y-2 mt-4">
+            <button onclick="switchTab('dash')" id="btn-dash" class="sidebar-btn sidebar-active w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 transition-all font-semibold text-sm">
+                <i class="fa-solid fa-house-chimney-window"></i> Main Hub
             </button>
-            <button onclick="showSection('directory')" class="sidebar-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-400 transition-all">
-                <i class="fa-solid fa-address-book"></i> <span class="text-sm font-semibold">Staff Directory</span>
+            <button onclick="switchTab('staff')" id="btn-staff" class="sidebar-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 transition-all font-semibold text-sm">
+                <i class="fa-solid fa-users-gear"></i> Staff Directory
             </button>
-            <button onclick="showSection('calendar')" class="sidebar-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-400 transition-all">
-                <i class="fa-solid fa-calendar-days"></i> <span class="text-sm font-semibold">Ops Calendar</span>
-            </button>
-            <button onclick="showSection('sandbox')" class="sidebar-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-400 transition-all">
-                <i class="fa-solid fa-vial"></i> <span class="text-sm font-semibold">Approval Sandbox</span>
-            </button>
-            
-            <p class="text-[10px] font-bold text-slate-600 uppercase mt-8 mb-2 px-4">Personal</p>
-            <button onclick="showSection('profile')" class="sidebar-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-400 transition-all">
-                <i class="fa-solid fa-user-gear"></i> <span class="text-sm font-semibold">My Credentials</span>
+            <button onclick="switchTab('tasks')" id="btn-tasks" class="sidebar-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 transition-all font-semibold text-sm">
+                <i class="fa-solid fa-list-check"></i> Enterprise Tasks
             </button>
         </nav>
 
-        <div class="p-4 border-t border-white/5">
-            <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-400/10 rounded-xl transition-all font-bold text-xs uppercase">
-                <i class="fa-solid fa-power-off"></i> Terminate Session
+        <div class="p-6 border-t border-white/5">
+            <button onclick="logout()" class="w-full py-3 bg-red-500/10 text-red-500 rounded-xl font-bold text-[10px] uppercase hover:bg-red-500 hover:text-white transition-all">
+                Terminate Session
             </button>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col relative overflow-hidden">
-        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 glass-panel relative z-40">
+        <header class="h-20 glass border-b border-white/5 flex items-center justify-between px-10 z-40">
             <div class="flex items-center gap-4">
-                <div class="bg-blue-500/10 text-blue-500 px-3 py-1 rounded-md text-[10px] mono font-bold border border-blue-500/20 uppercase">
-                    Status: Online // Node_Ilorin_01
-                </div>
+                <span id="live-time" class="mono text-[11px] text-slate-500"></span>
             </div>
-            
-            <div class="flex items-center gap-8">
-                <div class="relative cursor-pointer" onclick="toggleNotifications()">
-                    <i class="fa-solid fa-bell text-slate-400 hover:text-white transition-colors"></i>
-                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+
+            <div class="flex items-center gap-6">
+                <div class="text-right">
+                    <p id="user-name" class="font-bold text-sm">Syncing...</p>
+                    <p id="user-role" class="text-[9px] text-blue-400 mono uppercase tracking-widest">RANK_--</p>
                 </div>
-                <div class="flex items-center gap-3 border-l border-white/10 pl-8">
-                    <div class="text-right">
-                        <p id="nav-user-name" class="text-sm font-bold">---</p>
-                        <p id="nav-user-rank" class="text-[9px] text-blue-400 mono">RANK_--</p>
-                    </div>
-                    <img id="nav-user-img" src="https://ui-avatars.com/api/?background=3b82f6&color=fff" class="w-10 h-10 rounded-xl border border-white/10 shadow-lg">
-                </div>
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold" id="user-initials">?</div>
             </div>
         </header>
 
         <div id="viewport" class="flex-1 overflow-y-auto p-10 space-y-8 no-scrollbar">
             
-            <section id="sec-dashboard" class="content-sec space-y-8">
-                <h2 class="text-3xl font-extrabold tracking-tight">Intelligence <span class="text-slate-500">Overview</span></h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <section id="tab-dash" class="tab-content space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass p-8 rounded-[2rem] relative overflow-hidden group">
+                        <i class="fa-solid fa-users text-blue-500 absolute -right-4 -bottom-4 text-8xl opacity-5"></i>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Staff</p>
+                        <h2 id="count-staff" class="text-4xl font-extrabold mt-2">--</h2>
                     </div>
-            </section>
-
-            <section id="sec-calendar" class="content-sec hidden space-y-6 h-full">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-2xl font-bold">Operations <span class="text-blue-500">Calendar</span></h3>
-                    <button class="bg-blue-600 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-blue-500 transition-all">+ Schedule Meeting</button>
-                </div>
-                <div class="glass-panel p-6 rounded-3xl h-[600px]" id="calendar-root"></div>
-            </section>
-
-            <section id="sec-directory" class="content-sec hidden space-y-6">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-2xl font-bold">Global <span class="text-blue-500">Directory</span></h3>
-                    <input type="text" placeholder="Search Matrix..." class="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl text-sm w-80 focus:ring-2 ring-blue-500/50 transition-all">
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="directory-list">
+                    <div class="glass p-8 rounded-[2rem] relative overflow-hidden group">
+                        <i class="fa-solid fa-tower-broadcast text-emerald-500 absolute -right-4 -bottom-4 text-8xl opacity-5"></i>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Network Division</p>
+                        <h2 id="user-division" class="text-4xl font-extrabold mt-2 text-emerald-400">--</h2>
                     </div>
-            </section>
-
-            <section id="sec-sandbox" class="content-sec hidden space-y-6">
-                <h3 class="text-2xl font-bold">Code <span class="text-emerald-500">Sandbox & Approvals</span></h3>
-                <div class="glass-panel p-8 rounded-[2.5rem] border-l-4 border-emerald-500">
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <p class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-1">Queue: PR_#992</p>
-                            <h4 class="text-xl font-bold">Push Request: Cinexa Plus Live Sync</h4>
-                        </div>
-                        <div class="flex gap-3">
-                            <button class="bg-emerald-500/10 text-emerald-500 px-6 py-2 rounded-xl text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all">APPROVE</button>
-                            <button class="bg-red-500/10 text-red-500 px-6 py-2 rounded-xl text-xs font-bold hover:bg-red-500 hover:text-white transition-all">REJECT</button>
+                    <div class="glass p-8 rounded-[2rem]">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Access Status</p>
+                        <div class="flex items-center gap-3 mt-4">
+                            <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_12px_#10b981]"></span>
+                            <span class="font-bold text-lg uppercase tracking-widest">Active</span>
                         </div>
                     </div>
-                    <div class="bg-black/40 rounded-2xl p-6 mono text-xs text-blue-300 border border-white/5">
-                        <pre><code>// approval_logic.js
-if (auth.rank >= 8) {
-  system.deploy('Cinexa_Plus_v4');
-  log.event('CEO_AUTHORIZED_DEPLOY');
-}</code></pre>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="glass p-8 rounded-[2.5rem] space-y-6">
+                        <h3 class="font-bold text-xl">Operational Notifications</h3>
+                        <div id="notif-list" class="space-y-4">
+                            </div>
+                    </div>
+                    <div class="glass p-8 rounded-[2.5rem] space-y-6">
+                        <h3 class="font-bold text-xl">Recent Activity Logs</h3>
+                        <div id="activity-list" class="space-y-4">
+                            </div>
                     </div>
                 </div>
+            </section>
+
+            <section id="tab-staff" class="tab-content hidden space-y-6">
+                <div class="flex justify-between items-end">
+                    <h2 class="text-3xl font-extrabold italic">Institutional <span class="text-blue-500">Matrix</span></h2>
+                </div>
+                <div id="directory-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    </div>
+            </section>
+
+            <section id="tab-tasks" class="tab-content hidden space-y-6">
+                <h2 class="text-3xl font-extrabold italic">Mission <span class="text-amber-500">Board</span></h2>
+                <div id="task-list" class="space-y-4">
+                    </div>
             </section>
 
         </div>
     </main>
 
-    <div id="notif-panel" class="fixed right-0 top-0 bottom-0 w-80 glass-panel z-[100] translate-x-full transition-transform duration-300 p-8 shadow-2xl">
-        <div class="flex justify-between items-center mb-8">
-            <h5 class="font-bold uppercase tracking-widest text-xs">Signal Intel</h5>
-            <button onclick="toggleNotifications()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="space-y-4">
-            <div class="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
-                <p class="text-[10px] text-blue-500 font-bold uppercase mb-1">System</p>
-                <p class="text-xs text-slate-300">Security Handshake complete for Node: Ilorin Alpha.</p>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // NAVIGATION LOGIC
-        function showSection(id) {
-            document.querySelectorAll('.content-sec').forEach(sec => sec.classList.add('hidden'));
-            document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.remove('sidebar-active'));
-            
-            document.getElementById(`sec-${id}`).classList.remove('hidden');
-            event.currentTarget.classList.add('sidebar-active');
+        // --- 1. CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyACO46sTJQffwsQJfFN9cqYa_oDKG14AfQ",
+            authDomain: "hem-platform.firebaseapp.com",
+            projectId: "hem-platform",
+            storageBucket: "hem-platform.firebasestorage.app",
+            messagingSenderId: "846707696620",
+            appId: "1:846707696620:web:59676e4223dcbe6c9816c9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-            if(id === 'calendar') {
-                setTimeout(() => renderCalendar(), 100);
+        // --- 2. AUTH & USER SYNC ---
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const doc = await db.collection("hem_staff").doc(user.uid).get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    updateUI(data);
+                    syncRealTimeData();
+                }
+            } else {
+                window.location.href = 'login.html'; // Ensure this exists
             }
+        });
+
+        function updateUI(data) {
+            document.getElementById('user-name').innerText = data.name;
+            document.getElementById('user-role').innerText = `${data.role} // ${data.division}`;
+            document.getElementById('user-division').innerText = data.division;
+            document.getElementById('user-initials').innerText = data.name.charAt(0);
         }
 
-        // CALENDAR INITIALIZATION
-        function renderCalendar() {
-            var calendarEl = document.getElementById('calendar-root');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                themeSystem: 'standard',
-                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-                events: [
-                    { title: 'Launch Party Prep', start: '2026-04-18', color: '#3b82f6' },
-                    { title: 'Executive Board Call', start: '2026-04-20T10:00:00', color: '#10b981' }
-                ]
+        // --- 3. DATA SYNC ENGINES ---
+        function syncRealTimeData() {
+            // Staff Matrix Sync
+            db.collection("hem_staff").onSnapshot(snap => {
+                document.getElementById('count-staff').innerText = snap.size;
+                const grid = document.getElementById('directory-grid');
+                grid.innerHTML = '';
+                snap.forEach(doc => {
+                    const s = doc.data();
+                    grid.innerHTML += `
+                        <div class="glass p-6 rounded-[2rem] border-t-2 ${s.status === 'active' ? 'border-emerald-500' : 'border-slate-700'}">
+                            <p class="text-[9px] mono text-blue-400 font-bold uppercase mb-1">${s.role}</p>
+                            <h4 class="font-bold text-lg">${s.name}</h4>
+                            <p class="text-xs text-slate-500 mb-4">${s.email}</p>
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] mono font-bold">${s.division}</span>
+                        </div>
+                    `;
+                });
             });
-            calendar.render();
+
+            // Tasks Sync
+            db.collection("hem_tasks").limit(5).onSnapshot(snap => {
+                const list = document.getElementById('task-list');
+                list.innerHTML = '';
+                snap.forEach(doc => {
+                    const t = doc.data();
+                    list.innerHTML += `
+                        <div class="glass p-6 rounded-2xl flex justify-between items-center border-l-4 border-amber-500">
+                            <div>
+                                <h4 class="font-bold text-sm">${t.title || 'Untitled Operation'}</h4>
+                                <p class="text-[10px] text-slate-500 mono uppercase">${t.priority || 'Standard'}</p>
+                            </div>
+                            <button class="text-xs font-bold text-blue-400 uppercase tracking-widest">Execute</button>
+                        </div>
+                    `;
+                });
+            });
+
+            // Notification Sync
+            db.collection("hem_notifications").limit(3).onSnapshot(snap => {
+                const list = document.getElementById('notif-list');
+                list.innerHTML = '';
+                snap.forEach(doc => {
+                    const n = doc.data();
+                    list.innerHTML += `
+                        <div class="p-4 bg-white/5 border border-white/5 rounded-2xl flex gap-4 items-center">
+                            <div class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
+                            <p class="text-xs text-slate-300 font-medium">${n.message}</p>
+                        </div>
+                    `;
+                });
+            });
         }
 
-        function toggleNotifications() {
-            const panel = document.getElementById('notif-panel');
-            panel.classList.toggle('translate-x-full');
+        // --- 4. NAVIGATION UTILITIES ---
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('sidebar-active'));
+            
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-${tab}`).classList.add('sidebar-active');
         }
 
         function logout() {
-            if(confirm("Terminate H.E.M. CORE session?")) {
-                window.location.reload(); 
-            }
+            auth.signOut();
         }
+
+        setInterval(() => {
+            document.getElementById('live-time').innerText = new Date().toLocaleString('en-US', { hour12: false });
+        }, 1000);
     </script>
 </body>
 </html>
