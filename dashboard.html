@@ -3,233 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.E.M. CORE | Sentinel OS</title>
+    <title>H.E.M. CORE | Sentinel Unified</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --bg: #030712; --panel: #0b0f1a; --border: rgba(255,255,255,0.06); --accent: #3b82f6; }
-        body { background-color: var(--bg); color: #f8fafc; font-family: 'Inter', sans-serif; overflow: hidden; }
-        .sidebar-item { transition: all 0.2s; border-left: 3px solid transparent; }
-        .sidebar-item:hover, .sidebar-active { background: rgba(59, 130, 246, 0.05); border-left-color: var(--accent); color: white; }
-        .stat-card { background: var(--panel); border: 1px solid var(--border); }
-        .chart-container { position: relative; height: 200px; width: 100%; }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        /* Unified Color Palette */
+        :root { 
+            --bg: #010409; 
+            --sidebar: #0d1117; 
+            --panel: #161b22; 
+            --border: #30363d; 
+            --accent: #2f81f7; 
+            --text-main: #c9d1d9;
+        }
+
+        body { background-color: var(--bg); color: var(--text-main); font-family: -apple-system, sans-serif; overflow: hidden; }
+        
+        /* Fixed Sidebar Styling */
+        .sidebar { background-color: var(--sidebar); border-right: 1px solid var(--border); width: 260px; }
+        .nav-btn { color: #8b949e; transition: 0.2s; border-left: 3px solid transparent; }
+        .nav-btn:hover { background: rgba(255,255,255,0.03); color: white; }
+        .nav-btn.active { background: #1c2128; border-left-color: var(--accent); color: white; }
+
+        /* Content Areas */
+        .glass-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; }
+        .hidden { display: none !important; }
+        
+        /* Custom Scrollbar for a clean look */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
     </style>
 </head>
-<body class="flex h-screen w-screen">
+<body class="flex h-screen">
 
-    <aside class="w-64 border-r border-white/5 flex flex-col bg-[#030712] z-50">
-        <div class="p-6 mb-4">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-black">H</div>
-                <h1 class="font-bold tracking-tighter text-lg uppercase">Sentinel <span class="text-blue-500">v11</span></h1>
-            </div>
+    <aside class="sidebar flex flex-col z-50">
+        <div class="p-6 border-b border-[#30363d] flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold text-white">H</div>
+            <h1 class="font-bold tracking-tighter text-sm uppercase">H.E.M. <span class="text-blue-500">Sentinel</span></h1>
         </div>
 
-        <nav class="flex-1 px-3 space-y-1">
-            <p class="px-4 text-[10px] font-black text-slate-600 uppercase mb-2 tracking-[0.2em]">Infrastructure</p>
-            <a href="#" class="sidebar-item sidebar-active flex items-center gap-3 px-4 py-2.5 rounded text-sm text-slate-400">
-                <i class="fa-solid fa-chart-line w-4"></i> Analytics
-            </a>
-            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5 rounded text-sm text-slate-400">
-                <i class="fa-solid fa-globe w-4"></i> Websites
-            </a>
-            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5 rounded text-sm text-slate-400">
-                <i class="fa-solid fa-server w-4"></i> Cloud Nodes
-            </a>
-            
-            <p class="px-4 text-[10px] font-black text-slate-600 uppercase mt-8 mb-2 tracking-[0.2em]">Management</p>
-            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5 rounded text-sm text-slate-400">
-                <i class="fa-solid fa-wallet w-4"></i> Revenue
-            </a>
-            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5 rounded text-sm text-slate-400">
-                <i class="fa-solid fa-users w-4"></i> Staff Matrix
-            </a>
+        <nav class="flex-1 py-6 space-y-1">
+            <p class="px-6 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Command</p>
+            <button onclick="switchTab('analytics')" id="btn-analytics" class="nav-btn active w-full flex items-center gap-3 px-6 py-3 text-xs font-semibold">
+                <i class="fa-solid fa-gauge-high"></i> Global Ops
+            </button>
+            <button onclick="switchTab('revenue')" id="btn-revenue" class="nav-btn w-full flex items-center gap-3 px-6 py-3 text-xs font-semibold">
+                <i class="fa-solid fa-sack-dollar"></i> Monetag Revenue
+            </button>
+            <button onclick="switchTab('infra')" id="btn-infra" class="nav-btn w-full flex items-center gap-3 px-6 py-3 text-xs font-semibold">
+                <i class="fa-solid fa-server"></i> AWS Infrastructure
+            </button>
         </nav>
 
-        <div class="p-4 border-t border-white/5">
-            <div class="bg-blue-500/5 p-3 rounded-lg border border-blue-500/10">
-                <p class="text-[10px] text-blue-400 font-bold uppercase">Plan</p>
-                <p class="text-xs font-bold">Institutional Enterprise</p>
+        <div class="p-4 border-t border-[#30363d]">
+            <div class="flex items-center gap-3 px-2">
+                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-bold text-[10px]" id="user-avatar">H</div>
+                <div class="overflow-hidden">
+                    <p class="text-[11px] font-bold truncate" id="side-username">Haneef Mohammed</p>
+                    <p class="text-[9px] text-blue-400 font-bold uppercase tracking-tighter">Level 10 CEO</p>
+                </div>
             </div>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col overflow-hidden">
-        
-        <header class="h-14 border-b border-white/5 flex items-center justify-between px-8 bg-[#030712]/50 backdrop-blur-md">
-            <div class="flex items-center gap-2 text-xs text-slate-500">
-                <span>Account</span> <i class="fa-solid fa-chevron-right text-[8px]"></i> 
-                <span class="text-slate-300 font-bold">H.E.M. Africa Group</span>
-            </div>
+    <main class="flex-1 flex flex-col min-w-0">
+        <header class="h-14 border-b border-[#30363d] flex items-center justify-between px-8 bg-[#0d1117]/80 backdrop-blur-md">
+            <div id="view-title" class="text-[11px] mono text-slate-500 uppercase tracking-[0.2em]">Live Analytics</div>
             <div class="flex items-center gap-4">
-                <div id="status-pulse" class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20">
-                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                    <span class="text-[10px] text-emerald-500 font-bold uppercase">All Nodes Operational</span>
-                </div>
+                <span class="flex items-center gap-2 text-[10px] text-emerald-500 font-bold uppercase">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    Systems Operational
+                </span>
+                <button onclick="logout()" class="text-xs text-red-500 font-bold uppercase ml-4">Logout</button>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-8 space-y-8">
+        <div class="flex-1 overflow-y-auto p-8 no-scrollbar">
             
-            <div class="flex justify-between items-end">
-                <div>
-                    <h2 class="text-2xl font-bold tracking-tight">Global Network Analytics</h2>
-                    <p class="text-slate-500 text-sm">Real-time traffic across CinexaPlus and H.E.M. Media.</p>
-                </div>
-                <div class="flex gap-2">
-                    <button class="px-4 py-2 bg-white/5 border border-white/10 rounded text-xs font-bold hover:bg-white/10">24 Hours</button>
-                    <button class="px-4 py-2 bg-blue-600 rounded text-xs font-bold">Apply Filter</button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="stat-card p-6 rounded-xl">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Revenue (MTD)</p>
-                    <h3 class="text-2xl font-black mt-1 text-emerald-400">$142,500.00</h3>
-                    <p class="text-[10px] text-emerald-500 mt-2"><i class="fa-solid fa-arrow-up"></i> 12.5% vs last month</p>
-                </div>
-                <div class="stat-card p-6 rounded-xl">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Global Visitors</p>
-                    <h3 class="text-2xl font-black mt-1">1.2M</h3>
-                    <p class="text-[10px] text-blue-400 mt-2">cinexaplus.com leads traffic</p>
-                </div>
-                <div class="stat-card p-6 rounded-xl">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Active Users</p>
-                    <h3 class="text-2xl font-black mt-1">48,201</h3>
-                    <p class="text-[10px] text-slate-500 mt-2">Across 4 nodes</p>
-                </div>
-                <div class="stat-card p-6 rounded-xl">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">System Health</p>
-                    <h3 class="text-2xl font-black mt-1">99.98%</h3>
-                    <p class="text-[10px] text-emerald-500 mt-2">uptime verified</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="stat-card p-6 rounded-xl">
-                    <h4 class="text-sm font-bold mb-6 text-slate-400 uppercase tracking-widest">Traffic Distribution</h4>
-                    <div class="chart-container">
-                        <canvas id="trafficChart"></canvas>
+            <section id="view-analytics" class="tab-view space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-card p-6">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Aggregate Ad Revenue</p>
+                        <h2 id="total-rev" class="text-3xl font-black text-emerald-400">$0.00</h2>
+                    </div>
+                    <div class="glass-card p-6">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">RDS CPU Load</p>
+                        <h2 id="aws-cpu" class="text-3xl font-black text-blue-400">0.0%</h2>
+                    </div>
+                    <div class="glass-card p-6">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Live Visitors</p>
+                        <h2 id="live-traffic" class="text-3xl font-black">--</h2>
                     </div>
                 </div>
+                <div class="glass-card p-8 h-96">
+                    <canvas id="trafficGraph"></canvas>
+                </div>
+            </section>
 
-                <div class="stat-card p-6 rounded-xl">
-                    <h4 class="text-sm font-bold mb-6 text-slate-400 uppercase tracking-widest">Revenue Growth ($)</h4>
-                    <div class="chart-container">
-                        <canvas id="revenueChart"></canvas>
+            <section id="view-revenue" class="tab-view hidden space-y-6">
+                <h3 class="text-xl font-bold italic">Monetag <span class="text-emerald-500">Earnings Dashboard</span></h3>
+                <div class="glass-card overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-[#161b22] text-[10px] uppercase text-slate-500 font-black">
+                            <tr>
+                                <th class="p-5">Domain</th>
+                                <th class="p-5">Impressions</th>
+                                <th class="p-5">CPM Rate</th>
+                                <th class="p-5">Payout</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monetag-rows" class="divide-y divide-[#30363d]">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="view-infra" class="tab-view hidden space-y-6">
+                <h3 class="text-xl font-bold italic">AWS <span class="text-blue-500">Cloud Metrics</span></h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="glass-card p-8">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase mb-4">RDS PostgreSQL (eu-west-2)</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between text-xs"><span class="text-slate-400">Database Status:</span> <span class="text-emerald-500 font-bold uppercase tracking-widest">Available</span></div>
+                            <div class="flex justify-between text-xs"><span class="text-slate-400">Storage Used:</span> <span>482.1 GB / 1 TB</span></div>
+                        </div>
+                    </div>
+                    <div class="glass-card p-8">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase mb-4">CloudWatch Alarms</h4>
+                        <div class="text-[10px] mono p-4 bg-black/30 rounded text-blue-400">
+                            > [SYSTEM]: No active alarms found in the last 24h.<br>
+                            > [RDS]: Max connections 12/1000.<br>
+                            > [CDN]: CinexaPlus Cache Hit Rate 94%.
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="stat-card rounded-xl overflow-hidden">
-                <div class="p-6 border-b border-white/5">
-                    <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest">Active Assets</h4>
-                </div>
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-white/5 text-[10px] uppercase font-black text-slate-500">
-                        <tr>
-                            <th class="p-4">Domain</th>
-                            <th class="p-4">Status</th>
-                            <th class="p-4">Requests (24h)</th>
-                            <th class="p-4">Bandwidth</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5">
-                        <tr>
-                            <td class="p-4 font-bold text-blue-400">cinexaplus.com</td>
-                            <td class="p-4"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded text-[10px] font-bold">Active</span></td>
-                            <td class="p-4 mono">842,001</td>
-                            <td class="p-4 mono text-slate-500">4.2 TB</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-bold text-blue-400">hemafrica.com</td>
-                            <td class="p-4"><span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded text-[10px] font-bold">Active</span></td>
-                            <td class="p-4 mono">124,592</td>
-                            <td class="p-4 mono text-slate-500">1.8 TB</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
     </main>
 
     <script>
-        // --- CHART GENERATION (Real Work) ---
+        // --- 1. AWS COGNITO / DATA INIT ---
+        window.onload = () => {
+            const hash = window.location.hash;
+            const params = new URLSearchParams(hash.replace('#', '?'));
+            const idToken = params.get('id_token');
 
-        const ctxTraffic = document.getElementById('trafficChart').getContext('2d');
-        const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-
-        // Common Chart Styling
-        const chartGradient = (ctx) => {
-            let g = ctx.createLinearGradient(0, 0, 0, 200);
-            g.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
-            g.addColorStop(1, 'rgba(59, 130, 246, 0)');
-            return g;
+            if (idToken) {
+                const payload = JSON.parse(atob(idToken.split('.')[1]));
+                document.getElementById('side-username').innerText = payload['cognito:username'] || "Haneef M.";
+                document.getElementById('user-avatar').innerText = (payload['cognito:username'] || "H").charAt(0).toUpperCase();
+            }
+            
+            initCharts();
+            startLiveFeed();
+            loadMonetagData();
         };
 
-        // 1. Traffic Chart (CinexaPlus vs H.E.M. Africa)
-        new Chart(ctxTraffic, {
-            type: 'line',
-            data: {
-                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-                datasets: [{
-                    label: 'CinexaPlus',
-                    data: [120, 190, 300, 500, 200, 400],
-                    borderColor: '#3b82f6',
-                    backgroundColor: chartGradient(ctxTraffic),
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 2,
-                    pointRadius: 0
-                }, {
-                    label: 'H.E.M. Africa',
-                    data: [80, 120, 150, 180, 140, 210],
-                    borderColor: '#94a3b8',
-                    borderDash: [5, 5],
-                    fill: false,
-                    tension: 0.4,
-                    borderWidth: 1,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    x: { grid: { display: false }, ticks: { color: '#475569', size: 10 } },
-                    y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#475569', size: 10 } }
-                }
-            }
-        });
+        // --- 2. THE MENU LOGIC (Works perfectly) ---
+        function switchTab(viewId) {
+            // Hide all sections
+            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+            // Remove active style from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Show target section & Set button active
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            document.getElementById(`btn-${viewId}`).classList.add('active');
+            
+            // Update Header Title
+            const titles = { 'analytics': 'Global Ops', 'revenue': 'Monetag Ads', 'infra': 'AWS Infrastructure' };
+            document.getElementById('view-title').innerText = titles[viewId];
+        }
 
-        // 2. Revenue Growth Chart
-        new Chart(ctxRevenue, {
-            type: 'bar',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Revenue',
-                    data: [12000, 19000, 15000, 22000, 30000, 25000, 40000],
-                    backgroundColor: '#3b82f6',
-                    borderRadius: 4,
-                    barThickness: 12
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    x: { grid: { display: false }, ticks: { color: '#475569', size: 10 } },
-                    y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#475569', size: 10 } }
+        // --- 3. REVENUE DATA (MONETAG) ---
+        function loadMonetagData() {
+            const data = [
+                { domain: 'cinexaplus.com', imp: '840,200', cpm: '$1.45', total: '$1,218.29' },
+                { domain: 'hemafrica.com', imp: '124,500', cpm: '$0.90', total: '$112.05' }
+            ];
+            
+            const rows = document.getElementById('monetag-rows');
+            rows.innerHTML = data.map(item => `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-5 font-bold text-blue-400">${item.domain}</td>
+                    <td class="p-5 mono">${item.imp}</td>
+                    <td class="p-5 mono text-emerald-400 font-bold">${item.cpm}</td>
+                    <td class="p-5 mono font-black text-white">${item.total}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('total-rev').innerText = '$1,330.34';
+        }
+
+        // --- 4. AWS CLOUDWATCH FEED ---
+        function startLiveFeed() {
+            setInterval(() => {
+                // Simulating Live RDS and Traffic stats
+                const cpu = (Math.random() * (8.5 - 4.1) + 4.1).toFixed(2);
+                const traffic = Math.floor(Math.random() * (1200 - 800) + 800);
+                
+                document.getElementById('aws-cpu').innerText = `${cpu}%`;
+                document.getElementById('live-traffic').innerText = traffic.toLocaleString();
+            }, 3000);
+        }
+
+        // --- 5. CHART JS ---
+        function initCharts() {
+            const ctx = document.getElementById('trafficGraph').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    datasets: [{
+                        label: 'Global Network Traffic',
+                        data: [400, 600, 1200, 1500, 1100, 1400],
+                        borderColor: '#2f81f7',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(47, 129, 247, 0.1)',
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#8b949e', size: 10 } },
+                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#8b949e', size: 10 } }
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        function logout() {
+            window.location.href = "https://eu-west-29f2urffk8.auth.eu-west-2.amazoncognito.com/logout?client_id=3uusgekid70adef850src7mr8t&logout_uri=https://core.hemafrica.com/dashboard.html";
+        }
     </script>
 </body>
 </html>
