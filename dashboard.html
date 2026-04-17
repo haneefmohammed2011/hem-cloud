@@ -3,128 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.E.M. CORE | AWS Dashboard</title>
+    <title>H.E.M. CORE | Multi-Level OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root { --bg: #020617; --blue: #3b82f6; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.08); }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .level-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .level-card:hover { transform: translateY(-5px); border-color: var(--blue); }
+        .locked { filter: grayscale(1) opacity(0.3); cursor: not-allowed; }
         .hidden { display: none !important; }
-        .shimmer { background: linear-gradient(90deg, #020617 0%, #1e293b 50%, #020617 100%); background-size: 200% 100%; animation: shimmer 2s infinite; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col">
 
-    <div id="loader" class="fixed inset-0 z-[999] bg-[#020617] flex flex-col items-center justify-center gap-6">
-        <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-        <div class="text-center">
-            <p class="text-[10px] tracking-[0.5em] font-black text-blue-500 uppercase">H.E.M. Infrastructure</p>
-            <p class="text-slate-500 text-[9px] mono mt-2 italic">Verifying AWS Cognito Session...</p>
+    <div id="loader" class="fixed inset-0 z-[100] bg-[#020617] flex items-center justify-center">
+        <div class="flex flex-col items-center gap-4">
+            <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-[9px] mono tracking-[0.4em] text-blue-500 uppercase">Verifying Clearance...</p>
         </div>
     </div>
 
-    <div id="dashboard" class="hidden flex-1 flex flex-col animate-in fade-in duration-700">
-        <header class="h-20 glass flex items-center justify-between px-10 border-b border-white/5">
+    <div id="app" class="hidden flex-1 flex flex-col">
+        <header class="h-20 glass border-b border-white/5 flex items-center justify-between px-10">
             <div class="flex items-center gap-4">
-                <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <i class="fa-solid fa-bolt-lightning text-white text-xs"></i>
-                </div>
-                <h1 class="font-black italic text-xl tracking-tighter">H.E.M. <span class="text-blue-500">CORE</span></h1>
+                <h1 class="font-black italic text-xl">H.E.M. <span class="text-blue-500">SYSTEMS</span></h1>
+                <div id="rank-badge" class="px-3 py-1 rounded-md bg-blue-500/10 text-blue-400 text-[10px] font-bold mono">LEVEL --</div>
             </div>
-
+            
             <div class="flex items-center gap-6">
-                <div class="text-right border-r border-white/10 pr-6">
+                <div class="text-right">
                     <p id="user-name" class="font-bold text-sm tracking-tight text-white">---</p>
-                    <p id="user-role" class="text-[9px] text-blue-400 font-black mono uppercase">ACCESS_LEVEL_--</p>
+                    <p id="user-division" class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">DIVISION_--</p>
                 </div>
-                <button onclick="logout()" class="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
-                    <i class="fa-solid fa-power-off text-sm"></i>
-                </button>
+                <button onclick="logout()" class="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 transition-all"><i class="fa-solid fa-power-off"></i></button>
             </div>
         </header>
 
-        <main class="flex-1 p-10 overflow-y-auto space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass p-8 rounded-[2rem] border-l-4 border-blue-500">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Primary Node</p>
-                    <h3 class="text-2xl font-black">eu-west-2 <span class="text-blue-500">(London)</span></h3>
+        <main class="flex-1 p-10 overflow-y-auto space-y-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <div class="level-card glass p-8 rounded-[2rem]" id="feat-personal">
+                    <i class="fa-solid fa-id-card text-slate-400 mb-4 text-xl"></i>
+                    <h5 class="font-bold">Staff ID</h5>
+                    <p class="text-[10px] text-slate-500 mt-1 uppercase">View personal info & rank</p>
                 </div>
-                <div class="glass p-8 rounded-[2rem]">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Verified Identity</p>
-                    <h3 id="user-email" class="text-lg font-bold text-slate-300 truncate">---</h3>
+
+                <div class="level-card glass p-8 rounded-[2rem] locked" id="feat-tasks">
+                    <i class="fa-solid fa-list-check text-blue-500 mb-4 text-xl"></i>
+                    <h5 class="font-bold">Mission Board</h5>
+                    <p class="text-[10px] text-slate-500 mt-1 uppercase">Execute assigned tasks</p>
                 </div>
-                <div class="glass p-8 rounded-[2rem]">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Token Status</p>
-                    <div class="flex items-center gap-2">
-                        <span class="h-2 w-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                        <h3 class="text-lg font-black text-emerald-500 uppercase">Authorized</h3>
-                    </div>
+
+                <div class="level-card glass p-8 rounded-[2rem] locked" id="feat-directory">
+                    <i class="fa-solid fa-users-viewfinder text-emerald-500 mb-4 text-xl"></i>
+                    <h5 class="font-bold">Global Matrix</h5>
+                    <p class="text-[10px] text-slate-500 mt-1 uppercase">Staff & Admin directory</p>
+                </div>
+
+                <div class="level-card glass p-8 rounded-[2rem] locked" id="feat-override">
+                    <i class="fa-solid fa-microchip text-red-500 mb-4 text-xl"></i>
+                    <h5 class="font-bold">Core Infrastructure</h5>
+                    <p class="text-[10px] text-slate-500 mt-1 uppercase">AWS & Database Override</p>
                 </div>
             </div>
 
-            <div class="glass rounded-[2.5rem] p-10 min-h-[400px]">
-                <h4 class="font-black text-lg mb-6 tracking-tight">Institutional <span class="text-blue-500">Control Panel</span></h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-white/5 rounded-3xl p-6 border border-white/5 hover:border-blue-500/50 transition-all cursor-pointer group">
-                        <i class="fa-solid fa-folder-tree text-blue-500 mb-4 group-hover:scale-110 transition-transform"></i>
-                        <h5 class="font-bold">Media Repository</h5>
-                        <p class="text-xs text-slate-500 mt-2">Manage Cinexa Plus assets and cloud storage nodes.</p>
-                    </div>
-                    <div class="bg-white/5 rounded-3xl p-6 border border-white/5 hover:border-blue-500/50 transition-all cursor-pointer group">
-                        <i class="fa-solid fa-shield-halved text-emerald-500 mb-4 group-hover:scale-110 transition-transform"></i>
-                        <h5 class="font-bold">Security & Logs</h5>
-                        <p class="text-xs text-slate-500 mt-2">Review AWS CloudWatch metrics and access logs.</p>
+            <section id="workspace-admin" class="hidden space-y-6">
+                <h3 class="text-2xl font-black italic">Operational <span class="text-blue-500">Intelligence</span></h3>
+                <div class="glass rounded-[2.5rem] p-8 min-h-[300px]">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        <div class="space-y-4" id="admin-sandbox">
+                            <p class="text-xs font-bold text-slate-400 uppercase">Live Infrastructure Approval</p>
+                            <div class="bg-black/50 rounded-2xl p-6 border border-white/5 mono text-[11px] text-emerald-400">
+                                <p>> SELECT * FROM hem_cloud_nodes WHERE status = 'ACTIVE'</p>
+                                <p class="text-blue-400 mt-2">// Node_Ilorin: Operational</p>
+                                <p class="text-blue-400">// Node_London: Operational</p>
+                                <div class="mt-4 flex gap-4">
+                                    <button class="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-md border border-emerald-500/30">REBOOT SYSTEM</button>
+                                    <button class="px-4 py-2 bg-red-500/20 text-red-400 rounded-md border border-red-500/30">PURGE CACHE</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-xs font-bold text-slate-400 uppercase">Division Announcements</p>
+                            <div class="space-y-3">
+                                <div class="p-4 bg-white/5 rounded-2xl flex gap-4 items-center border border-white/5">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                    <p class="text-xs text-slate-300 font-medium italic">"Cinexa Plus deployment scheduled for 04/20."</p>
+                                </div>
+                                <div class="p-4 bg-white/5 rounded-2xl flex gap-4 items-center border border-white/5">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                    <p class="text-xs text-slate-300 font-medium italic">"Staff meeting moved to London Node Virtual."</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </main>
     </div>
 
     <script>
-        // 1. THE AUTH GATEKEEPER
         window.onload = () => {
-            // Cognito sends tokens in the URL fragment (after #)
             const hash = window.location.hash;
             const params = new URLSearchParams(hash.replace('#', '?'));
             const idToken = params.get('id_token');
 
             if (!idToken) {
-                // FORCE REDIRECT TO YOUR COGNITO LOGIN
-                const cognitoUrl = "https://eu-west-29f2urffk8.auth.eu-west-2.amazoncognito.com/login?client_id=3uusgekid70adef850src7mr8t&redirect_uri=https://core.hemafrica.com/dashboard.html&response_type=token&scope=email+openid+phone+profile";
-                window.location.href = cognitoUrl;
+                window.location.href = "https://eu-west-29f2urffk8.auth.eu-west-2.amazoncognito.com/login?client_id=3uusgekid70adef850src7mr8t&redirect_uri=https://core.hemafrica.com/dashboard.html&response_type=token&scope=email+openid+phone+profile";
                 return;
             }
 
-            // 2. TOKEN DECODING
             try {
                 const payload = JSON.parse(atob(idToken.split('.')[1]));
-                console.log("H.E.M. Security Clearance Granted:", payload);
-
-                // UI Data Mapping
+                console.log("Verified Level:", payload['custom:accessLevel']);
+                
+                // DATA MAPPING
+                const level = parseInt(payload['custom:accessLevel'] || 1);
                 document.getElementById('user-name').innerText = payload['cognito:username'] || payload.email.split('@')[0];
-                document.getElementById('user-email').innerText = payload.email;
-                document.getElementById('user-role').innerText = `ACCESS_LVL_${payload['custom:accessLevel'] || '1'}`;
+                document.getElementById('user-division').innerText = payload['custom:division'] || "HMN GENERAL";
+                document.getElementById('rank-badge').innerText = `LEVEL ${level}`;
+
+                // --- ACCESS CONTROL ENGINE ---
+                
+                // Level 3+ Unlocks
+                if (level >= 3) {
+                    document.getElementById('feat-tasks').classList.remove('locked');
+                }
+                
+                // Level 7+ Unlocks
+                if (level >= 7) {
+                    document.getElementById('feat-directory').classList.remove('locked');
+                    document.getElementById('workspace-admin').classList.remove('hidden');
+                }
+
+                // Level 10 Master Override
+                if (level === 10) {
+                    document.getElementById('feat-override').classList.remove('locked');
+                    document.getElementById('admin-sandbox').classList.remove('hidden');
+                }
 
                 // Reveal Dashboard
                 document.getElementById('loader').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-
-                // 3. CLEAN URL (Optional: remove token from browser bar for safety)
-                // window.history.replaceState(null, "", window.location.pathname);
+                document.getElementById('app').classList.remove('hidden');
 
             } catch (err) {
-                console.error("Token Corruption Detected:", err);
+                console.error("Auth Corruption:", err);
                 window.location.reload();
             }
         };
 
         function logout() {
-            // Redirect to Cognito Logout
-            const logoutUrl = "https://eu-west-29f2urffk8.auth.eu-west-2.amazoncognito.com/logout?client_id=3uusgekid70adef850src7mr8t&logout_uri=https://core.hemafrica.com/dashboard.html";
-            window.location.href = logoutUrl;
+            window.location.href = "https://eu-west-29f2urffk8.auth.eu-west-2.amazoncognito.com/logout?client_id=3uusgekid70adef850src7mr8t&logout_uri=https://core.hemafrica.com/dashboard.html";
         }
     </script>
 </body>
