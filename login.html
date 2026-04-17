@@ -95,28 +95,39 @@
         <a href="mailto:it@hemafrica.com" class="footer-link">ENCRYPTED SUPPORT CHANNEL</a>
     </div>
 
-    <script>
-        // UPDATED CONFIG BASED ON YOUR AWS SCREENSHOT
+   <script>
+        // UPDATED CONFIG FOR LIVE INSTITUTIONAL DEPLOY
         const config = {
             cognitoDomain: "https://eu-west-29f2urffk8.auth.eu-west-2.amazoncognito.com",
             clientId: "3uusgekid70adef850src7mr8t",
-            redirectUri: "https://core.hemafrica.com"
+            // MUST match your AWS Console Callback URL exactly
+            redirectUri: "https://core.hemafrica.com/dashboard.html" 
         };
 
         function redirectToCognito() {
-            // Correct URL construction for AWS Managed Login
-            const loginUrl = `${config.cognitoDomain}/login?client_id=${config.clientId}&response_type=code&scope=email+openid+phone+profile&redirect_uri=${encodeURIComponent(config.redirectUri)}`;
+            // response_type=token allows the dashboard to grab the session immediately
+            const loginUrl = `${config.cognitoDomain}/login?client_id=${config.clientId}&response_type=token&scope=email+openid+phone+profile&redirect_uri=${encodeURIComponent(config.redirectUri)}`;
             
             window.location.href = loginUrl;
         }
 
         function checkSession() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.has('code')) {
+            // Since we switched to 'token', we check the URL hash (#), not search params (?)
+            const hash = window.location.hash;
+            if (hash.includes('id_token=')) {
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('auth-view').classList.remove('hidden');
                 document.getElementById('system-status').style.color = "var(--success)";
                 document.getElementById('system-status').innerText = "STATUS: ONLINE";
+                
+                // Optional: Store the token before moving to dashboard
+                const token = new URLSearchParams(hash.replace('#', '?')).get('id_token');
+                localStorage.setItem('hem_token', token);
+                
+                // Small delay to show the "Access Granted" message
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
             }
         }
 

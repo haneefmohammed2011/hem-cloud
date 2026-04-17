@@ -3,145 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HEM Africa Group | Institutional Home</title>
+    <title>H.E.M. AFRICA | IT Support Node</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --accent: #003399; --deep: #001f5c; --bg-dark: #050b14; 
+        :root {
+            --accent: #003399; --deep: #001f5c; --bg-dark: #050b14;
             --border: #e1e8f0; --text-muted: #94a3b8; --neon: #00ff88;
+            --white: #ffffff; --danger: #ff4444;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: #ffffff; color: #1a1a1b; line-height: 1.6; }
+        body { background: var(--white); color: #1a1a1b; line-height: 1.6; overflow-x: hidden; }
 
-        /* --- CINEMATIC POPUP --- */
-        .migration-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #0a192f 0%, #02060d 100%);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 10000; backdrop-filter: blur(15px); transition: opacity 0.6s ease;
+        /* --- HERO --- */
+        .support-hero {
+            padding: 50px 2rem; text-align: center;
+            background: radial-gradient(circle at 70% 30%, #f0f4ff, #ffffff);
+            border-bottom: 1px solid var(--border);
         }
-        .migration-card { background: #fff; max-width: 850px; width: 95%; box-shadow: 0 60px 120px rgba(0,0,0,0.9); display: flex; flex-direction: column; }
-        .pop-header { background: var(--deep); color: white; padding: 50px 40px; text-align: center; border-bottom: 4px solid var(--accent); }
-        .pop-header h2 { font-size: 2.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: -2px; }
-        .sys-logs { padding: 40px; background: #050b14; color: var(--neon); font-family: 'Space Mono', monospace; font-size: 0.7rem; }
 
-        /* --- HERO & QUOTES --- */
-        .hero { padding: 120px 2rem; text-align: center; background: radial-gradient(circle at 70% 30%, #f0f4ff, #ffffff); }
-        .hero h1 { font-size: 5rem; font-weight: 800; color: var(--deep); letter-spacing: -2px; line-height: 1; }
-        
-        .quote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; max-width: 1400px; margin: 80px auto; padding: 0 2rem; }
-        .quote-card { border-left: 4px solid var(--accent); padding: 30px; background: #f8fafc; }
-        .quote-card p { font-size: 1.1rem; font-style: italic; margin-bottom: 15px; color: #334155; }
-        .quote-card span { font-weight: 800; font-size: 0.8rem; text-transform: uppercase; color: var(--deep); }
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--bg-dark); color: var(--neon);
+            padding: 8px 16px; font-family: 'Space Mono', monospace;
+            font-size: 0.7rem; border-radius: 2px; margin-bottom: 20px;
+        }
 
-        .btn-portal { background: var(--deep); color: white; padding: 20px 40px; text-decoration: none; font-weight: 800; display: inline-block; margin-top: 40px; border-radius: 2px; }
-        .btn-portal:hover { background: var(--accent); }
+        .pulse {
+            width: 8px; height: 8px; background: var(--neon);
+            border-radius: 50%; box-shadow: 0 0 10px var(--neon);
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* --- SEARCH ARCHITECTURE --- */
+        .search-section { max-width: 900px; margin: -40px auto 40px; padding: 0 1rem; }
+        .search-bar { display: flex; background: white; box-shadow: 0 20px 50px rgba(0,31,92,0.1); border: 1px solid var(--border); }
+        .search-bar input { flex: 1; border: none; padding: 25px; font-size: 1.1rem; outline: none; }
+        .search-bar button { background: var(--deep); color: white; border: none; padding: 0 40px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+
+        #search-results {
+            margin-top: 20px; display: none; background: #f8fafc;
+            border: 2px solid var(--deep); padding: 30px; animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- TERMINAL TELEMETRY --- */
+        .terminal-container {
+            max-width: 1300px; margin: 0 auto 100px; padding: 0 2rem;
+        }
+
+        .terminal-header {
+            background: #1e293b; color: white; padding: 10px 20px;
+            font-family: 'Space Mono', monospace; font-size: 0.75rem;
+            display: flex; justify-content: space-between; border-radius: 4px 4px 0 0;
+        }
+
+        .log-window {
+            font-family: 'Space Mono', monospace; font-size: 0.8rem;
+            color: #4ade80; background: var(--bg-dark);
+            padding: 25px; height: 400px; overflow-y: auto;
+            border: 1px solid #1e293b; border-top: none;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+        }
+
+        .log-entry { margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
+        .log-ts { color: var(--text-muted); font-size: 0.7rem; margin-right: 10px; }
+        .log-tag { font-weight: 700; padding: 2px 6px; border-radius: 2px; font-size: 0.65rem; margin-right: 10px; }
+        .tag-aws { background: #ff9900; color: black; }
+        .tag-firebase { background: #ffca28; color: black; }
+        .tag-cinexa { background: var(--accent); color: white; }
+        .tag-pinglo { background: #ec4899; color: white; }
+
+        /* --- FOOTER --- */
+        footer { border-top: 1px solid var(--border); padding: 60px 2rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; }
     </style>
 </head>
 <body>
-    <div id="migration-popup" class="migration-overlay">
-        <div class="migration-card">
-            <div class="pop-header"><h2>SYSTEMS ONLINE</h2><p>H.E.M. CORE INITIALIZATION</p></div>
-            <div class="sys-logs">
-                > AWS eu-west-2 Deployment... [OK]<br>
-                > Cinexa Plus Metadata Sync... [COMPLETE]<br>
-                > Global SSO Handshake... [READY]
-            </div>
-            <div style="padding: 25px; background: #f1f5f9; text-align: right;">
-                <button onclick="closeMigration()" style="background: var(--deep); color: white; border: none; padding: 15px 40px; font-weight: 800; cursor: pointer;">ENTER CORE</button>
-            </div>
-        </div>
-    </div>
 
-    <header class="hero">
-        <p style="font-weight: 800; color: var(--accent); letter-spacing: 3px; text-transform: uppercase;">The Hustle Excellence Movement</p>
-        <h1>Institutional<br>Infrastructure.</h1>
-        <a href="login.html" class="btn-portal">ACCESS COGNITO PORTAL</a>
+    <header class="support-hero">
+        <div class="status-badge"><div class="pulse"></div> INFRASTRUCTURE TELEMETRY: ACTIVE</div>
+        <h1 style="font-size: 3.5rem; font-weight: 900; color: var(--deep); letter-spacing: -2px;">System Logs.</h1>
+        <p style="color: var(--text-muted); font-weight: 700;">H.E.M. AFRICA • CORE OPERATIONS CENTRE</p>
     </header>
 
-    <div class="quote-grid">
-        <div class="quote-card">
-            <p>"The people who are crazy enough to think they can change the world are the ones who do."</p>
-            <span>— Steve Jobs</span>
+    <section class="search-section">
+        <div class="search-bar">
+            <input type="text" id="userInput" placeholder="Search Infrastructure Handbook (e.g. EC2, Firebase, SSL)..." onkeyup="if(event.keyCode===13) executeSearch()">
+            <button onclick="executeSearch()">SEARCH</button>
         </div>
-        <div class="quote-card">
-            <p>"If something is important enough, even if the odds are against you, you should still do it."</p>
-            <span>— Elon Musk</span>
-        </div>
-        <div class="quote-card">
-            <p>"Success is a lousy teacher. It seduces smart people into thinking they can't lose."</p>
-            <span>— Bill Gates</span>
-        </div>
-    </div>
-
-    <section style="max-width: 1400px; margin: 0 auto; padding: 100px 2rem; border-top: 1px solid var(--border);">
-        <h2 style="font-size: 2.5rem; color: var(--deep); margin-bottom: 40px;">H.E.M. Division Control</h2>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-            <div style="background: #050b14; color: white; padding: 40px;">
-                <h4 style="color: var(--neon);">CINEXA PLUS</h4>
-                <p>Media Discovery Engine</p>
-            </div>
-            <div style="background: #050b14; color: white; padding: 40px;">
-                <h4 style="color: var(--neon);">PINGLO</h4>
-                <p>Connectivity Protocol</p>
-            </div>
-            <div style="background: #050b14; color: white; padding: 40px;">
-                <h4 style="color: var(--neon);">HMN NEWS</h4>
-                <p>Media Sovereignty</p>
-            </div>
+        <div id="search-results">
+            <h2 id="res-title"></h2>
+            <p id="res-body"></p>
         </div>
     </section>
-    <footer style="background: #f8fafc; padding: 100px 2rem 60px; border-top: 1px solid var(--border); margin-top: 100px;">
-        <div style="max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px;">
-            
-            <div>
-                <h2 style="font-weight: 900; font-size: 1.5rem; letter-spacing: -1px;">H.E.M. <span style="color: var(--accent);">AFRICA</span></h2>
-                <p style="color: #5f6368; font-size: 0.9rem; margin-top: 15px; max-width: 300px;">
-                    The parental holding company for next-generation African digital infrastructure and media sovereignty.
-                </p>
-            </div>
 
-            <div>
-                <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--deep); margin-bottom: 25px;">Ecosystem</h4>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="margin-bottom: 12px;"><a href="https://hemafrica.com" target="_blank" style="text-decoration: none; color: #5f6368; font-size: 0.85rem; font-weight: 600;">Corporate Home</a></li>
-                    <li style="margin-bottom: 12px;"><a href="https://cinexaplus.com" target="_blank" style="text-decoration: none; color: #5f6368; font-size: 0.85rem; font-weight: 600;">Cinexa Plus</a></li>
-                    <li style="margin-bottom: 12px;"><a href="https://news.hemafrica.com" target="_blank" style="text-decoration: none; color: #5f6368; font-size: 0.85rem; font-weight: 600;">HEM Newsroom</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--deep); margin-bottom: 25px;">Cloud Status</h4>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="margin-bottom: 12px; color: #5f6368; font-size: 0.85rem;">AWS Region: <span style="color: var(--neon); background: #050b14; padding: 2px 6px; border-radius: 2px; font-family: 'Space Mono'; font-size: 0.7rem;">eu-west-2</span></li>
-                    <li style="margin-bottom: 12px; color: #5f6368; font-size: 0.85rem;">SSO Node: <span style="color: var(--accent); font-weight: 800;">ACTIVE</span></li>
-                    <li style="margin-bottom: 12px; color: #5f6368; font-size: 0.85rem;">Uptime: 99.98%</li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--deep); margin-bottom: 25px;">Internal</h4>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="margin-bottom: 12px;"><a href="login.html" style="text-decoration: none; color: var(--accent); font-size: 0.85rem; font-weight: 800;">Staff Portal</a></li>
-                    <li style="margin-bottom: 12px;"><a href="it-support.html" style="text-decoration: none; color: #5f6368; font-size: 0.85rem; font-weight: 600;">IT Support</a></li>
-                </ul>
-            </div>
+    <main class="terminal-container">
+        <div class="terminal-header">
+            <span>TERMINAL: hem-infrastructure-monitor-v2.0</span>
+            <span>REGION: NG-ILORIN-HQ</span>
         </div>
-
-        <div style="max-width: 1400px; margin: 80px auto 0; border-top: 1px solid var(--border); padding-top: 40px; display: flex; justify-content: space-between; align-items: center;">
-            <p style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">© 2026 H.E.M. AFRICA GROUP. ARCHITECTING EXCELLENCE.</p>
-            <div style="display: flex; gap: 20px;">
-                <span style="font-size: 0.7rem; font-weight: 800; color: var(--deep);">NG</span>
-                <span style="font-size: 0.7rem; font-weight: 800; color: var(--deep);">US</span>
+        <div class="log-window" id="logWindow">
             </div>
-        </div>
+    </main>
+
+    <footer>
+        © 2026 H.E.M. AFRICA GROUP. ALL SYSTEMS OPERATIONAL.
     </footer>
 
     <script>
-        function closeMigration() {
-            document.getElementById('migration-popup').style.opacity = '0';
-            setTimeout(() => { document.getElementById('migration-popup').style.display = 'none'; }, 600);
+        // --- HANDBOOK LOGIC ---
+        const handbook = {
+            "aws": { title: "AWS Cloud Management", body: "Check eu-west-2 instance status. If EC2 is unreachable, verify Security Group ingress for port 22. DB access is restricted to Ilorin IP range." },
+            "firebase": { title: "Firebase / Pinglo Backend", body: "Real-time DB rules are set to internal-only. If Pinglo messages fail, check the Firestore 'Usage' tab for socket limits." },
+            "ec2": { title: "EC2 Node-01 (Main)", body: "Ubuntu 22.04 LTS. Managed via AWS Systems Manager. Logs are synced to CloudWatch every 5 minutes." },
+            "ssl": { title: "Certificate Status", body: "Cloudflare Origin Certificates are active for *.hemafrica.com. Do not bypass the proxy." }
+        };
+
+        function executeSearch() {
+            const input = document.getElementById('userInput').value.toLowerCase();
+            const resultsDiv = document.getElementById('search-results');
+            if (handbook[input]) {
+                document.getElementById('res-title').innerText = handbook[input].title;
+                document.getElementById('res-body').innerText = handbook[input].body;
+                resultsDiv.style.display = 'block';
+            }
         }
+
+        // --- REAL-TIME LOG SIMULATOR ---
+        const logData = [
+            { tag: "AWS", type: "tag-aws", msg: "EC2 Node-01: CPU Load 12.4% | Memory 2.1GB/8GB" },
+            { tag: "FIREBASE", type: "tag-firebase", msg: "Firestore Write: Pinglo-Alpha-Channel | Success [22ms]" },
+            { tag: "CINEXA", type: "tag-cinexa", msg: "Metadata Sync: TMDB API Handshake verified." },
+            { tag: "AWS", type: "tag-aws", msg: "S3 Bucket 'hem-assets-public': Access log updated." },
+            { tag: "PINGLO", type: "tag-pinglo", msg: "Socket connection opened: User_Node_8829 (Ilorin)" },
+            { tag: "SYSTEM", type: "tag-cinexa", msg: "SSO Cognito Handshake: OK." },
+            { tag: "FIREBASE", type: "tag-firebase", msg: "Real-time DB: 42 active connections in NG region." },
+            { tag: "AWS", type: "tag-aws", msg: "RDS Postgres: Write-Ahead Log backup complete." }
+        ];
+
+        function addLog() {
+            const win = document.getElementById('logWindow');
+            const data = logData[Math.floor(Math.random() * logData.length)];
+            const ts = new Date().toLocaleTimeString();
+            
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `
+                <span class="log-ts">[${ts}]</span>
+                <span class="log-tag ${data.type}">${data.tag}</span>
+                <span>${data.msg}</span>
+            `;
+            
+            win.appendChild(div);
+            win.scrollTop = win.scrollHeight;
+            
+            if (win.childNodes.length > 50) win.removeChild(win.firstChild);
+        }
+
+        // Run logs every 2 seconds to simulate "Live" monitoring
+        setInterval(addLog, 2000);
+        addLog(); // Initial call
     </script>
 </body>
 </html>

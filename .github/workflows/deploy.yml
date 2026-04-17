@@ -1,24 +1,21 @@
 name: H.E.M. Core Auto-Deploy
-
 on:
   push:
     branches:
-      - main  # Standardized to main
-
+      - main
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Deploy to AWS EC2
+      - name: Deploy to AWS EC2 via SSH
         uses: appleboy/ssh-action@master
         with:
           host: 18.168.21.127
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /var/www/html
-            sudo git pull origin main
+            cd /var/www/hem-cloud
+            git fetch origin main
+            git reset --hard origin/main
+            sudo chown -R www-data:www-data /var/www/hem-cloud
             sudo systemctl restart nginx

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H.E.M. AFRICA | IT Support Node</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #003399;
+            --deep: #001f5c;
+            --bg-dark: #050b14;
+            --border: #e1e8f0;
+            --text-muted: #94a3b8;
+            --neon: #00ff88;
+            --white: #ffffff;
+            --danger: #ff4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { background: var(--white); color: #1a1a1b; line-height: 1.6; }
+
+        /* --- HERO --- */
+        .support-hero {
+            padding: 80px 2rem;
+            text-align: center;
+            background: radial-gradient(circle at 70% 30%, #f0f4ff, #ffffff);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-dark);
+            color: var(--neon);
+            padding: 8px 16px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            border-radius: 2px;
+            margin-bottom: 20px;
+        }
+
+        .pulse {
+            width: 8px; height: 8px; background: var(--neon);
+            border-radius: 50%; box-shadow: 0 0 10px var(--neon);
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* --- SEARCH & RESULTS --- */
+        .search-section { max-width: 800px; margin: -40px auto 40px; padding: 0 1rem; }
+        .search-bar { display: flex; background: white; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .search-bar input { flex: 1; border: none; padding: 20px; font-size: 1rem; outline: none; }
+        .search-bar button { background: var(--deep); color: white; border: none; padding: 0 30px; font-weight: 800; cursor: pointer; }
+
+        #search-results {
+            margin-top: 20px;
+            display: none;
+            background: #f8fafc;
+            border: 1px solid var(--accent);
+            padding: 20px;
+        }
+
+        /* --- CARDS --- */
+        .portal-grid {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px; padding: 40px 2rem;
+        }
+        .support-card {
+            border: 1px solid var(--border); padding: 30px;
+            transition: 0.3s; cursor: pointer;
+        }
+        .support-card:hover { border-color: var(--accent); background: #fdfdfd; }
+        .support-card h3 { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 1px; margin-bottom: 10px; }
+
+        /* --- TERMINAL FOOTER --- */
+        .terminal-footer { background: var(--bg-dark); color: white; padding: 60px 2rem; }
+        .terminal-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; gap: 40px; }
+        .log-window {
+            font-family: 'Space Mono', monospace; font-size: 0.7rem;
+            color: var(--text-muted); background: rgba(255,255,255,0.03);
+            padding: 20px; flex: 1; height: 150px; overflow-y: hidden;
+            border-left: 2px solid var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="support-hero">
+        <div class="status-badge"><div class="pulse"></div> H.E.M. CORE STATUS: NOMINAL</div>
+        <h1 style="font-size: 3.5rem; font-weight: 800; color: var(--deep);">IT Support.</h1>
+    </header>
+
+    <section class="search-section">
+        <div class="search-bar">
+            <input type="text" id="userInput" placeholder="Type issue (e.g., VPN, login, Cinexa, email)...">
+            <button onclick="executeSearch()">SEARCH HANDBOOK</button>
+        </div>
+        <div id="search-results">
+            <h4 id="res-title" style="color: var(--deep); margin-bottom: 10px;"></h4>
+            <p id="res-body" style="font-size: 0.9rem; color: #475569;"></p>
+        </div>
+    </section>
+
+    <main class="portal-grid">
+        <div class="support-card" onclick="setSearch('VPN')">
+            <h3>NETWORK</h3>
+            <p>VPN & Remote Node Access</p>
+        </div>
+        <div class="support-card" onclick="setSearch('Cinexa')">
+            <h3>MEDIA</h3>
+            <p>Cinexa Plus Pipeline Support</p>
+        </div>
+        <div class="support-card" onclick="setSearch('Password')">
+            <h3>IAM</h3>
+            <p>Identity & Credential Reset</p>
+        </div>
+    </main>
+
+    <footer class="terminal-footer">
+        <div class="terminal-content">
+            <div style="flex: 0.5;">
+                <h3 style="color: var(--neon); font-family: 'Space Mono'; font-size: 0.8rem;">SYSTEM_LOGS</h3>
+                <p style="font-size: 0.8rem; margin-top: 10px; color: var(--text-muted);">Monitoring H.E.M. Infrastructure across NG/US nodes.</p>
+            </div>
+            <div class="log-window" id="logWindow">
+                > Initializing Security Protocol...<br>
+                > AWS eu-west-2 Handshake: OK<br>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- REAL HANDBOOK DATA ---
+        const handbook = {
+            "vpn": {
+                title: "VPN & Network Connectivity",
+                body: "Ensure you are using the H.E.M. Global Tunnel. If connection times out, flush your DNS and restart the AWS Client VPN. Check if your IAM role has 'NetworkAccess' permissions."
+            },
+            "cinexa": {
+                title: "Cinexa Plus Metadata Sync",
+                body: "If movie metadata is missing, trigger a manual refresh via the Cinexa Admin Console. Ensure the S3 bucket permissions are set to 'Internal-Read'."
+            },
+            "pinglo": {
+                title: "Pinglo Connectivity (Pre-Launch)",
+                body: "Pinglo is currently in closed-alpha. Connectivity nodes are restricted to dev-environment only. Public launch protocols are pending."
+            },
+            "password": {
+                title: "IAM Credential Reset",
+                body: "Use the AWS Cognito Self-Service portal to reset passwords. MFA tokens must be synced via the corporate Authenticator app."
+            },
+            "email": {
+                title: "Corporate Email Setup",
+                body: "H.E.M. Africa uses WorkMail. Ensure your IMAP settings point to the 'hem-africa.com' endpoint and SSL is enabled."
+            }
+        };
+
+        function executeSearch() {
+            const input = document.getElementById('userInput').value.toLowerCase();
+            const resultsDiv = document.getElementById('search-results');
+            const resTitle = document.getElementById('res-title');
+            const resBody = document.getElementById('res-body');
+
+            let found = false;
+            for (let key in handbook) {
+                if (input.includes(key)) {
+                    resTitle.innerText = handbook[key].title;
+                    resBody.innerText = handbook[key].body;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                resultsDiv.style.display = 'block';
+            } else {
+                resTitle.innerText = "No Results Found";
+                resBody.innerText = "Please contact the system administrator directly or try keywords like 'VPN' or 'Cinexa'.";
+                resultsDiv.style.display = 'block';
+            }
+        }
+
+        function setSearch(val) {
+            document.getElementById('userInput').value = val;
+            executeSearch();
+        }
+
+        // --- REAL-TIME LOG FEED ---
+        const liveLogs = [
+            "> Security Audit: No breaches detected.",
+            "> Data sovereignty protocol: ACTIVE.",
+            "> Pinging SSO Gateway... [OK]",
+            "> Refreshing Cinexa Plus API tokens...",
+            "> Pinglo Status: [STAGED / PRE-LAUNCH]",
+            "> Database RDS-Postgres: NOMINAL",
+            "> Cloudflare DNS: Routing Verified"
+        ];
+
+        let i = 0;
+        setInterval(() => {
+            const win = document.getElementById('logWindow');
+            const entry = document.createElement('div');
+            entry.innerHTML = liveLogs[i];
+            win.appendChild(entry);
+            if (win.childNodes.length > 8) win.removeChild(win.firstChild);
+            i = (i + 1) % liveLogs.length;
+        }, 3000);
+    </script>
+</body>
+</html>
