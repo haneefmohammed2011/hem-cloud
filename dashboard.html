@@ -3,201 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.E.M. CORE | LEVEL 10 CEO</title>
+    <title>H.E.M. CORE | CEO LEVEL 10</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { 
-            --void: #000000; 
-            --accent: #007aff; 
-            --glass: rgba(10, 10, 10, 0.85);
-            --border: rgba(255, 255, 255, 0.08);
-        }
-
-        body { 
-            background: #000000;
-            color: #ffffff; 
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-            overflow: hidden; height: 100vh;
-        }
-
-        /* GLASSMORPHISM ENGINE */
-        .glass-panel { background: var(--glass); backdrop-filter: blur(60px); border: 0.5px solid var(--border); }
-        .glass-card { background: rgba(255, 255, 255, 0.02); border: 0.5px solid var(--border); border-radius: 28px; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .glass-card:hover { border-color: var(--accent); background: rgba(255, 255, 255, 0.05); transform: translateY(-2px); }
-        
-        /* TERMINAL STYLING */
-        .mono { font-family: "SF Mono", "Fira Code", monospace; }
+        :root { --accent: #007aff; --void: #020617; --glass: rgba(15, 23, 42, 0.8); }
+        body { background-color: #000; color: #fff; font-family: 'SF Pro Display', -apple-system, sans-serif; overflow: hidden; height: 100vh; }
+        .glass { background: var(--glass); backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.1); }
+        .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; transition: 0.3s; }
+        .card:hover { border-color: var(--accent); background: rgba(255,255,255,0.05); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-
-        .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-radius: 14px; color: #8e8e93; font-size: 13px; font-weight: 600; transition: 0.3s; }
-        .nav-item.active { background: var(--accent); color: #fff; box-shadow: 0 8px 30px rgba(0, 122, 255, 0.3); }
-
-        /* ACCESS LEVEL BADGE */
-        .level-badge { background: linear-gradient(135deg, #007aff, #00c6ff); padding: 2px 8px; border-radius: 6px; font-size: 9px; font-weight: 900; color: white; text-transform: uppercase; }
+        .mono { font-family: 'SF Mono', 'Fira Code', monospace; }
+        
+        /* TERMINAL TEXT ANIMATION */
+        @keyframes blink { 50% { opacity: 0; } }
+        .cursor { display: inline-block; width: 8px; height: 15px; background: var(--accent); animation: blink 1s infinite; }
     </style>
 </head>
 <body class="flex">
 
-    <aside class="w-[300px] glass-panel flex flex-col p-8 z-50">
-        <div class="flex items-center gap-4 mb-14">
-            <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-400 rounded-2xl flex items-center justify-center font-black italic shadow-2xl">H</div>
+    <aside class="w-72 glass h-screen flex flex-col p-6 z-50">
+        <div class="mb-10 px-2 flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black italic shadow-lg shadow-blue-500/20">H</div>
             <div>
                 <h1 class="text-sm font-black tracking-tight uppercase">H.E.M. CORE</h1>
-                <p class="text-[9px] text-blue-500 font-bold tracking-[0.2em]">ADMIN OS V1.0</p>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">v1.5.0 STABLE</span>
+                </div>
             </div>
         </div>
 
-        <nav class="flex-1 space-y-1 no-scrollbar overflow-y-auto">
-            <p class="px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-4">Operations</p>
-            <button class="nav-item active w-full" onclick="switchView('mainframe')"><i class="fa-solid fa-house-signal"></i> Mainframe</button>
-            <button class="nav-item w-full" data-level="2"><i class="fa-solid fa-headset"></i> Support</button>
-            <button class="nav-item w-full" data-level="3"><i class="fa-solid fa-shield-halved"></i> Moderation</button>
-            <button class="nav-item w-full" data-level="5"><i class="fa-solid fa-gears"></i> Ops Management</button>
+        <nav class="flex-1 space-y-1 overflow-y-auto no-scrollbar">
+            <p class="text-[10px] font-bold text-slate-600 uppercase mb-4 px-2">Mainframe</p>
+            <button onclick="showTab('dash')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition text-sm font-medium text-slate-400 hover:text-white">
+                <i class="fa-solid fa-gauge-high"></i> Executive View
+            </button>
             
-            <p class="px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mt-10 mb-4">Executive</p>
-            <button class="nav-item w-full" data-level="7"><i class="fa-solid fa-vault"></i> Financials</button>
-            <button class="nav-item w-full" data-level="8"><i class="fa-solid fa-chart-line"></i> Strategy</button>
-            <button class="nav-item w-full" data-level="10"><i class="fa-solid fa-brain"></i> Ontrixa AI</button>
+            <p class="text-[10px] font-bold text-slate-600 uppercase mt-8 mb-4 px-2">Ecosystem</p>
+            <button onclick="showTab('cinexa')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition text-sm font-medium text-slate-400 hover:text-white">
+                <i class="fa-solid fa-play"></i> Cinexa+ Admin
+            </button>
+            <button onclick="showTab('pinglo')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition text-sm font-medium text-slate-400 hover:text-white">
+                <i class="fa-solid fa-hashtag"></i> Pinglo Mods
+            </button>
+            
+            <p class="text-[10px] font-bold text-slate-600 uppercase mt-8 mb-4 px-2">Access Level: <span id="lvl-display" class="text-blue-500">10</span></p>
+            <select id="roleEngine" onchange="updateRBAC()" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-xs text-white outline-none">
+                <option value="1">Lvl 1 - Staff</option>
+                <option value="5">Lvl 5 - Operations</option>
+                <option value="10" selected>Lvl 10 - CEO</option>
+            </select>
         </nav>
 
-        <div class="mt-auto glass-card p-5 bg-blue-500/5 border-blue-500/20">
-            <div class="flex justify-between items-center mb-2">
-                <span class="level-badge">Level 10 CEO</span>
-                <i class="fa-solid fa-crown text-blue-400 text-[10px]"></i>
-            </div>
-            <p class="text-xs font-bold">Haneef Mohammed</p>
-            <p class="text-[9px] text-slate-500 uppercase font-black mt-1">Class A Shareholder</p>
+        <div class="mt-auto card p-4 bg-blue-600/5 border-blue-500/20">
+            <p class="text-[10px] font-black text-blue-500 uppercase">Haneef Mohammed</p>
+            <p class="text-[9px] text-slate-500 font-bold uppercase mt-1 italic">Founding Director</p>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col overflow-y-auto bg-black no-scrollbar">
-        <header class="h-28 flex items-center justify-between px-12 border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-40">
+        <header class="h-24 border-b border-white/5 flex items-center justify-between px-10 sticky top-0 bg-black/50 backdrop-blur-xl z-40">
             <div>
-                <h2 class="text-3xl font-black italic uppercase tracking-tighter">System Mainframe</h2>
-                <div class="flex items-center gap-3 mt-1">
-                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_#10b981]"></span>
-                    <span id="system-status" class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Neural Link: ACTIVE</span>
-                </div>
+                <h2 id="view-title" class="text-xl font-black uppercase tracking-tight">Mainframe Controller</h2>
+                <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">London Node: eu-west-2</p>
             </div>
             
-            <div class="flex gap-4" data-level="10">
-                <button onclick="termCommand('reboot')" class="px-6 py-3 glass-card bg-blue-600/10 border-blue-500/30 text-blue-500 text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white">
-                    Quick Reboot
-                </button>
-                <button onclick="termCommand('kill')" class="px-6 py-3 glass-card bg-red-600/10 border-red-500/30 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white">
-                    Emergency Kill
+            <div class="flex gap-4">
+                <button onclick="runCommand('reboot')" data-level="10" class="px-5 py-2.5 card bg-red-600/10 border-red-500/30 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white">
+                    Emergency Reboot
                 </button>
             </div>
         </header>
 
-        <div class="p-12 space-y-10">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="glass-card p-6">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Global Revenue</p>
-                    <h3 class="text-2xl font-black tabular-nums">$1,432,590</h3>
+        <div class="p-10 space-y-8">
+            <div id="tab-dash" class="tab-content space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="card p-6"><p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Total Rev</p><h3 class="text-2xl font-black">$1.4M</h3></div>
+                    <div class="card p-6"><p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Active Users</p><h3 class="text-2xl font-black">12.4k</h3></div>
+                    <div class="card p-6" data-level="10"><p class="text-[10px] font-bold text-slate-500 uppercase mb-2">EC2 CPU</p><h3 id="cpu-stat" class="text-2xl font-black text-blue-500">4.1%</h3></div>
+                    <div class="card p-6"><p class="text-[10px] font-bold text-slate-500 uppercase mb-2">System Health</p><h3 class="text-2xl font-black text-emerald-500">Online</h3></div>
                 </div>
-                <div class="glass-card p-6" data-level="5">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Total Users</p>
-                    <h3 class="text-2xl font-black tabular-nums">842,109</h3>
-                </div>
-                <div class="glass-card p-6">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Active Nodes</p>
-                    <h3 class="text-2xl font-black text-blue-500 tabular-nums">12</h3>
-                </div>
-                <div class="glass-card p-6">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">AI Cycles</p>
-                    <h3 class="text-2xl font-black tabular-nums">4.2k/s</h3>
-                </div>
-            </div>
 
-            <div class="glass-card bg-black/90 border-blue-500/30 overflow-hidden flex flex-col h-[550px]" data-level="10">
-                <div class="px-6 py-4 bg-blue-600/10 border-b border-white/5 flex justify-between items-center">
-                    <div class="flex gap-2">
-                        <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div data-level="10" class="card bg-black border-blue-500/30 overflow-hidden flex flex-col h-[400px]">
+                    <div class="px-5 py-3 bg-white/5 border-b border-white/5 flex justify-between items-center">
+                        <span class="text-[10px] font-black text-blue-500 uppercase mono tracking-tighter italic">H.E.M. Neural Terminal</span>
+                        <span class="text-[9px] text-slate-600 mono">auth_token: class_a_verified</span>
                     </div>
-                    <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">H.E.M. Tactical Terminal</p>
-                    <span class="text-[9px] text-slate-500 mono">auth: hem_ceo_001</span>
-                </div>
-
-                <div id="term-out" class="flex-1 p-8 overflow-y-auto mono text-[13px] text-blue-400 space-y-2 no-scrollbar">
-                    <p class="text-slate-500">H.E.M. Core OS [Version 1.0.42-STABLE]</p>
-                    <p class="text-slate-500">Node ID: i-0985c49080b06b005 | Region: eu-west-2</p>
-                    <p class="mt-4 text-emerald-500 font-bold">Neural Link Verified. Standing by for CEO input.</p>
-                </div>
-
-                <div class="p-8 bg-white/[0.02] flex items-center gap-4">
-                    <span class="text-blue-500 font-bold">CEO@HEM_CORE:~$</span>
-                    <input type="text" id="term-in" autofocus 
-                           class="bg-transparent border-none outline-none text-white flex-1 mono text-[13px]" 
-                           placeholder="Type command (reboot, status, logs)...">
+                    <div id="term-out" class="flex-1 p-6 overflow-y-auto mono text-xs text-blue-400 space-y-1 no-scrollbar">
+                        <p class="text-slate-500">>> H.E.M Core OS v1.5.0 Initialized...</p>
+                        <p class="text-slate-500">>> Handshake with eu-west-2 established.</p>
+                    </div>
+                    <div class="p-4 bg-white/[0.02] flex items-center gap-3">
+                        <span class="text-blue-500 font-bold mono">CEO@HEM:~$</span>
+                        <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white flex-1 mono text-xs" placeholder="Execute command...">
+                    </div>
                 </div>
             </div>
+
+            <div id="tab-cinexa" class="tab-content hidden"><h1 class="text-2xl font-black">Cinexa+ Content Manager</h1></div>
+            <div id="tab-pinglo" class="tab-content hidden"><h1 class="text-2xl font-black">Pinglo Social Moderator</h1></div>
         </div>
     </main>
 
     <script>
         const LAMBDA_URL = 'https://4brozf732fjjkfd6i7y3sz3rcm0ydiey.lambda-url.eu-west-2.on.aws/';
-        const CEO_LEVEL = 10; // Set to 10 for full access
+        const CEO_KEY = 'YOUR_SECRET_CEO_KEY'; // Change this to your actual key
+
+        // --- TAB ENGINE ---
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('view-title').innerText = tabId.toUpperCase() + ' Operations';
+        }
 
         // --- RBAC ENGINE ---
-        function applyRBAC() {
+        function updateRBAC() {
+            const level = parseInt(document.getElementById('roleEngine').value);
+            document.getElementById('lvl-display').innerText = level;
             document.querySelectorAll('[data-level]').forEach(el => {
-                if (parseInt(el.getAttribute('data-level')) > CEO_LEVEL) {
-                    el.style.display = 'none';
-                }
+                const req = parseInt(el.getAttribute('data-level'));
+                el.style.display = level >= req ? 'block' : 'none';
             });
         }
 
-        // --- TERMINAL ENGINE ---
+        // --- TERMINAL & AWS ENGINE ---
         const termIn = document.getElementById('term-in');
         const termOut = document.getElementById('term-out');
 
-        const log = (msg, type = 'info') => {
-            const colors = { info: 'text-blue-400', err: 'text-red-500', ok: 'text-emerald-500', cmd: 'text-white' };
+        const print = (text, type = 'info') => {
             const p = document.createElement('p');
-            p.className = colors[type];
-            p.innerHTML = `<span class="text-slate-700">>></span> ${msg}`;
+            p.className = type === 'err' ? 'text-red-500' : (type === 'ok' ? 'text-emerald-500' : 'text-blue-400');
+            p.innerHTML = `<span class="text-slate-700">>></span> ${text}`;
             termOut.appendChild(p);
             termOut.scrollTop = termOut.scrollHeight;
         };
 
-        async function termCommand(cmd) {
-            log(cmd, 'cmd');
+        async function runCommand(cmd) {
+            print(`<span class="text-white">${cmd}</span>`);
             
             if (cmd === 'reboot') {
-                log("INITIATING SECURE AWS HANDSHAKE...", 'info');
+                print("INITIATING SECURE AWS REBOOT CALL...");
                 try {
+                    // SET TIMEOUT TO PREVENT GATEWAY ERRORS
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
                     const res = await fetch(LAMBDA_URL, {
                         method: 'POST',
-                        body: JSON.stringify({ token: 'YOUR_SECRET_CEO_KEY', action: 'REBOOT' })
+                        body: JSON.stringify({ token: CEO_KEY, action: 'REBOOT' }),
+                        signal: controller.signal
                     });
-                    if (res.ok) log("SUCCESS: Primary EC2 Node power-cycled.", 'ok');
-                    else log("ACCESS DENIED: Check Lambda configuration.", 'err');
-                } catch (e) { log("CONNECTION ERROR: Gateway Timeout.", 'err'); }
-            } else if (cmd === 'status') {
-                log("NODE: i-0985... | HEALTH: 100% | LOAD: 4.2% | REGION: LONDON", 'ok');
+                    
+                    if (res.ok) print("SUCCESS: EC2 reboot command accepted.", "ok");
+                    else print("FAILED: AWS Lambda returned error code.", "err");
+                    
+                } catch (e) {
+                    print("GATEWAY TIMEOUT: Server is likely already rebooting or Lambda is warming up.", "err");
+                }
             } else if (cmd === 'help') {
-                log("reboot | status | clear | kill | finance_summary", 'info');
+                print("Commands: reboot | status | clear | users");
             } else if (cmd === 'clear') {
                 termOut.innerHTML = '';
             } else {
-                log(`Command '${cmd}' not recognized.`, 'err');
+                print("Unknown command sequence.", "err");
             }
         }
 
         termIn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                termCommand(termIn.value.toLowerCase().trim());
+                runCommand(termIn.value.toLowerCase().trim());
                 termIn.value = '';
             }
         });
 
-        applyRBAC();
+        // LIVE STATS SIMULATION
+        setInterval(() => {
+            const cpu = (Math.random() * (5 - 2) + 2).toFixed(1);
+            document.getElementById('cpu-stat').innerText = cpu + '%';
+        }, 3000);
+
+        // INIT
+        updateRBAC();
     </script>
 </body>
 </html>
