@@ -8,192 +8,111 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #050a10; }
-        .glass { background: rgba(16, 42, 67, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .sidebar-active { background: linear-gradient(90deg, #3B82F6 0%, transparent 100%); border-left: 4px solid #3B82F6; }
+        :root { --hem-navy: #050a10; --hem-blue: #3B82F6; --hem-glass: rgba(16, 42, 67, 0.6); }
+        body { font-family: 'Inter', sans-serif; background-color: var(--hem-navy); color: #e2e8f0; overflow: hidden; }
+        .glass { background: var(--hem-glass); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .sidebar-active { background: linear-gradient(90deg, var(--hem-blue) 0%, transparent 100%); border-left: 4px solid var(--hem-blue); color: white !important; }
         .mono { font-family: 'Space Mono', monospace; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); background-size: 200% 100%; animation: shimmer 2s infinite; }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        [data-role-required] { display: none; } /* Hidden by default until JS clears */
+        #app-loader { transition: opacity 0.5s ease; }
+        .hidden-node { display: none !important; }
     </style>
 </head>
-<body class="text-slate-200 overflow-hidden">
+<body>
 
-    <div id="auth-gate" class="fixed inset-0 z-[100] bg-[#050a10] flex items-center justify-center p-4">
-        <div class="max-w-md w-full glass p-8 rounded-2xl shadow-2xl">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-extrabold tracking-tighter text-white">HEM <span class="text-blue-500">CORE</span></h2>
-                <p class="text-slate-400 text-sm mt-2">Institutional Access Required</p>
-            </div>
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Work Email</label>
-                    <input type="email" id="login-email" required class="w-full bg-[#0a1118] border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Access Cipher</label>
-                    <input type="password" id="login-password" required class="w-full bg-[#0a1118] border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all">
-                </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all transform active:scale-95">AUTHENTICATE</button>
-            </form>
-            <p id="login-error" class="text-red-500 text-xs mt-4 text-center hidden"></p>
+    <div id="app-loader" class="fixed inset-0 z-[200] bg-[#050a10] flex flex-col items-center justify-center">
+        <div class="mb-4">
+            <h1 class="text-4xl font-black italic tracking-tighter">H.E.M <span class="text-blue-500">CORE</span></h1>
         </div>
+        <div class="w-48 h-1 bg-white/5 rounded-full overflow-hidden">
+            <div id="load-progress" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
+        </div>
+        <p id="auth-status" class="mt-4 text-[10px] mono text-slate-500 uppercase tracking-widest">Initialising Handshake...</p>
+        <button id="manual-login" class="hidden mt-6 bg-blue-600 px-6 py-2 rounded-lg font-bold text-xs">RE-AUTHENTICATE WITH AWS</button>
     </div>
 
-    <div id="admin-panel" class="flex h-screen w-full hidden">
+    <div id="core-interface" class="flex h-screen w-full opacity-0 transition-opacity duration-1000">
         
-        <aside class="w-64 bg-[#08121d] border-r border-white/5 flex flex-col">
-            <div class="p-6">
-                <h1 class="text-xl font-black tracking-tighter italic">H.E.M <span class="text-blue-500">CORE</span></h1>
-                <p class="text-[10px] text-slate-500 mono mt-1 uppercase tracking-widest">Global Ops Panel</p>
+        <aside class="w-72 bg-[#08121d] border-r border-white/5 flex flex-col">
+            <div class="p-8">
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span class="text-xs font-black mono tracking-tighter uppercase">Intelligence OS v6.0</span>
+                </div>
             </div>
 
-            <nav class="flex-1 px-4 space-y-1 no-scrollbar overflow-y-auto">
-                <div class="text-[10px] font-bold text-slate-600 uppercase mb-2 px-2">Main</div>
-                <button onclick="switchPage('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl sidebar-active text-white transition-all">
-                    <i class="fa-solid fa-layer-group text-blue-500"></i> <span class="text-sm font-semibold">Overview</span>
+            <nav class="flex-1 px-6 space-y-2">
+                <p class="text-[10px] font-bold text-slate-600 uppercase mb-4 px-2">Operational Nodes</p>
+                <button onclick="nav('dashboard')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl sidebar-active">
+                    <i class="fa-solid fa-grid-2"></i> <span class="text-sm font-semibold">Command Center</span>
                 </button>
-                
-                <div data-role-required="7" class="mt-6">
-                    <div class="text-[10px] font-bold text-slate-600 uppercase mb-2 px-2">Management</div>
-                    <button onclick="switchPage('directory')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all">
-                        <i class="fa-solid fa-users"></i> <span class="text-sm font-semibold">User Directory</span>
-                    </button>
-                    <button onclick="switchPage('content')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all">
-                        <i class="fa-solid fa-clapperboard"></i> <span class="text-sm font-semibold">Cinexa+ CMS</span>
-                    </button>
-                </div>
-
-                <div data-role-required="9" class="mt-6">
-                    <div class="text-[10px] font-bold text-slate-600 uppercase mb-2 px-2">Governance</div>
-                    <button onclick="switchPage('analytics')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all">
-                        <i class="fa-solid fa-chart-line"></i> <span class="text-sm font-semibold">Financials</span>
-                    </button>
-                    <button data-role-required="10" onclick="switchPage('root')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all">
-                        <i class="fa-solid fa-microchip"></i> <span class="text-sm font-semibold text-red-400">System Root</span>
-                    </button>
-                </div>
+                <button onclick="nav('directory')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all">
+                    <i class="fa-solid fa-users-viewfinder"></i> <span class="text-sm font-semibold">Staff Matrix</span>
+                </button>
+                <button data-rank="9" onclick="nav('revenue')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all hidden-node">
+                    <i class="fa-solid fa-vault"></i> <span class="text-sm font-semibold text-emerald-400">Fiscal Pulse</span>
+                </button>
+                <button data-rank="10" onclick="nav('root')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all hidden-node">
+                    <i class="fa-solid fa-microchip"></i> <span class="text-sm font-semibold text-red-500">System Root</span>
+                </button>
             </nav>
 
-            <div class="p-4 bg-[#0a1824] border-t border-white/5">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg" id="avatar-initial">H</div>
+            <div class="p-6 bg-[#0a1824] border-t border-white/5">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-900 flex items-center justify-center font-black shadow-2xl" id="ceo-avatar">H</div>
                     <div class="flex-1 overflow-hidden">
-                        <p class="text-xs font-bold truncate" id="admin-name">Loading...</p>
-                        <p class="text-[9px] mono text-blue-400" id="admin-role-label">RANK --</p>
+                        <p class="text-sm font-bold truncate" id="op-name">H. Mohammed</p>
+                        <p class="text-[9px] mono text-blue-400 font-bold" id="op-rank">RANK 10 // CEO</p>
                     </div>
-                    <button onclick="logout()" class="text-slate-500 hover:text-red-500"><i class="fa-solid fa-right-from-bracket"></i></button>
                 </div>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col relative overflow-hidden">
-            <header class="h-16 glass flex items-center justify-between px-8 z-10">
-                <div class="flex items-center gap-4">
-                    <i class="fa-solid fa-search text-slate-500"></i>
-                    <input type="text" placeholder="Search Core Intelligence..." class="bg-transparent border-none text-sm outline-none w-64">
-                </div>
-                <div class="flex items-center gap-6 text-slate-400">
-                    <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500"></div> <span class="text-[10px] mono uppercase">Pinglo Node: Active</span></div>
-                    <i class="fa-solid fa-bell cursor-pointer hover:text-white"></i>
+        <main class="flex-1 flex flex-col relative">
+            <header class="h-20 border-b border-white/5 flex items-center justify-between px-10">
+                <h2 id="page-title" class="text-lg font-bold">Command Center</h2>
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <p class="text-[9px] text-slate-500 mono uppercase">Network Node</p>
+                        <p id="node-ip" class="text-xs font-bold text-blue-500">Detecting...</p>
+                    </div>
                 </div>
             </header>
 
-            <section id="content-area" class="flex-1 overflow-y-auto p-8 no-scrollbar">
-                
-                <div id="page-dashboard" class="page-content space-y-8 animate-in fade-in">
-                    <div class="flex justify-between items-end">
-                        <div>
-                            <h2 class="text-3xl font-black text-white">Executive <span class="text-blue-500">Overview</span></h2>
-                            <p class="text-slate-400">Welcome back, CEO. Systems are at 99.9% uptime.</p>
+            <div id="view-port" class="flex-1 overflow-y-auto p-10 space-y-8">
+                <div id="view-dashboard" class="space-y-8 animate-in fade-in duration-500">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="glass p-8 rounded-3xl relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-6 opacity-5 text-6xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-coins"></i></div>
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Live Revenue</p>
+                            <h3 id="rev-display" class="text-4xl font-black mt-2 mono text-white">$0.00</h3>
+                            <div id="rev-chart-mini" class="mt-4 h-12 w-full"></div>
                         </div>
-                        <div class="flex gap-2">
-                            <button class="bg-blue-600/10 text-blue-500 px-4 py-2 rounded-lg text-xs font-bold border border-blue-600/20">DOWNLOAD REPORT</button>
+                        <div class="glass p-8 rounded-3xl">
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Platform Traffic</p>
+                            <h3 class="text-4xl font-black mt-2 mono text-blue-500">8.4k <span class="text-xs text-slate-600">REQ/S</span></h3>
                         </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="glass p-6 rounded-2xl relative overflow-hidden">
-                            <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl"><i class="fa-solid fa-users"></i></div>
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Operators</p>
-                            <h3 class="text-2xl font-black mt-2 mono" id="stat-users">0</h3>
-                            <p class="text-[10px] text-green-500 mt-1 font-bold">+12% from last month</p>
-                        </div>
-                        <div class="glass p-6 rounded-2xl">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Revenue</p>
-                            <h3 class="text-2xl font-black mt-2 mono text-blue-500">$124,500</h3>
-                            <div class="w-full bg-white/5 h-1 mt-4 rounded-full overflow-hidden"><div class="bg-blue-500 h-full w-[70%]"></div></div>
-                        </div>
-                        <div class="glass p-6 rounded-2xl">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Cinexa+ Streaming</p>
-                            <h3 class="text-2xl font-black mt-2 mono">1.2 PB</h3>
-                            <p class="text-[10px] text-slate-500 mt-1">Storage Node: Frankfurt</p>
-                        </div>
-                        <div class="glass p-6 rounded-2xl">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">System Health</p>
-                            <h3 class="text-2xl font-black mt-2 mono text-green-500">99.99%</h3>
-                            <p class="text-[10px] text-slate-500 mt-1">Latency: 24ms</p>
+                        <div class="glass p-8 rounded-3xl">
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cloud Nodes</p>
+                            <h3 class="text-4xl font-black mt-2 mono">32 <span class="text-xs text-green-500">ONLINE</span></h3>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 glass p-6 rounded-2xl min-h-[400px]">
-                            <h4 class="text-sm font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-chart-area text-blue-500"></i> Network Growth</h4>
-                            <canvas id="growthChart"></canvas>
-                        </div>
-                        <div class="glass p-6 rounded-2xl">
-                            <h4 class="text-sm font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-history text-blue-500"></i> Terminal Logs</h4>
-                            <div class="space-y-4" id="recent-logs">
-                                <div class="flex items-start gap-3 border-l-2 border-blue-500 pl-4 py-1">
-                                    <div>
-                                        <p class="text-xs font-bold">New Admin Registered</p>
-                                        <p class="text-[10px] text-slate-500">2 minutes ago • System</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="glass p-8 rounded-3xl min-h-[400px]">
+                        <canvas id="mainGrowthChart"></canvas>
                     </div>
                 </div>
-
-                <div id="page-directory" class="page-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-2xl font-black">User <span class="text-blue-500">Intelligence</span></h2>
-                        <button data-role-required="8" class="bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-bold">ENROLL NEW OPERATOR</button>
-                    </div>
-
-                    <div class="glass rounded-2xl overflow-hidden">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-white/5 text-[10px] uppercase font-bold text-slate-500 tracking-widest">
-                                <tr>
-                                    <th class="px-6 py-4">Operator</th>
-                                    <th class="px-6 py-4">Rank / Role</th>
-                                    <th class="px-6 py-4">Platform Node</th>
-                                    <th class="px-6 py-4">Last Activity</th>
-                                    <th class="px-6 py-4 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="user-table-body" class="text-sm">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </section>
+            </div>
         </main>
     </div>
 
-    <div id="modal-container" class="fixed inset-0 z-[110] bg-black/80 flex items-center justify-center hidden p-4">
-        <div class="max-w-xl w-full glass p-8 rounded-2xl" id="modal-content"></div>
-    </div>
-
     <script>
-        // --- 1. CONFIGURATION ---
+        // --- ⚙️ CONFIGURATION & HANDSHAKE ---
         const firebaseConfig = {
             apiKey: "AIzaSyACO46sTJQffwsQJfFN9cqYa_oDKG14AfQ",
             authDomain: "hem-platform.firebaseapp.com",
@@ -205,138 +124,112 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
+        const COGNITO_LOGIN_URL = "https://eu-west-29f2urffk8.auth.eu-west-2.amazoncognito.com/login?client_id=3uusgekid70adef850src7mr8t&redirect_uri=https://core.hemafrica.com/dashboard.html&response_type=token&scope=email+openid+phone+profile";
 
-        let userData = null;
-        let growthChart = null;
+        let currentOperator = null;
 
-        // --- 2. AUTH ENGINE ---
-        document.getElementById('login-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-password').value;
-            const err = document.getElementById('login-error');
+        // --- 🧠 JWT & AUTH ENGINE ---
+        async function authenticate() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const idToken = params.get('id_token');
+
+            if (!idToken) {
+                // No token found - Check if already logged in via Session or Redirect
+                document.getElementById('auth-status').innerText = "Redirecting to AWS Identity Provider...";
+                document.getElementById('manual-login').classList.remove('hidden');
+                document.getElementById('manual-login').onclick = () => window.location.href = COGNITO_LOGIN_URL;
+                return;
+            }
 
             try {
-                await auth.signInWithEmailAndPassword(email, pass);
-                err.classList.add('hidden');
-            } catch (e) {
-                err.innerText = "ACCESS DENIED: Credentials rejected by CORE.";
-                err.classList.remove('hidden');
-            }
-        };
+                // Decode Cognito JWT
+                const payload = JSON.parse(atob(idToken.split('.')[1]));
+                const cognitoSub = payload.sub; 
+                
+                document.getElementById('auth-status').innerText = `Handshake Verified: ${payload.email}`;
+                document.getElementById('load-progress').style.width = "60%";
 
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                const doc = await db.collection("users").doc(user.uid).get();
-                if (!doc.exists) {
-                    // One-time initialization for new admins
-                    userData = { 
-                        displayName: user.email.split('@')[0], 
-                        email: user.email, 
-                        accessLevel: 10, // Defaulting to CEO for your account setup
-                        lastLogin: new Date().toISOString()
-                    };
-                    await db.collection("users").doc(user.uid).set(userData);
+                // Handshake with Firestore Rules 'hem_staff' collection
+                const staffDoc = await db.collection("hem_staff").doc(cognitoSub).get();
+                
+                if (staffDoc.exists) {
+                    currentOperator = staffDoc.data();
+                    launchTerminal();
                 } else {
-                    userData = doc.data();
+                    // CEO Emergency Bypass: If first login
+                    if(payload.email.includes("haneef")) {
+                        await db.collection("hem_staff").doc(cognitoSub).set({
+                            displayName: "Haneef Mohammed",
+                            email: payload.email,
+                            accessLevel: 10,
+                            lastLogin: new Date().toISOString()
+                        });
+                        location.reload();
+                    } else {
+                        throw new Error("UNAUTHORIZED_NODE");
+                    }
                 }
-                initDashboard();
-            } else {
-                document.getElementById('auth-gate').classList.remove('hidden');
-                document.getElementById('admin-panel').classList.add('hidden');
+            } catch (err) {
+                document.getElementById('auth-status').innerText = "SYSTEM ERROR: Access Denied to Matrix.";
+                console.error(err);
             }
-        });
-
-        function logout() {
-            auth.signOut();
         }
 
-        // --- 3. CORE LOGIC ---
-        function initDashboard() {
-            document.getElementById('auth-gate').classList.add('hidden');
-            document.getElementById('admin-panel').classList.remove('hidden');
-            
-            // Set UI details
-            document.getElementById('admin-name').innerText = userData.displayName;
-            document.getElementById('admin-role-label').innerText = `RANK ${userData.accessLevel} // ${getRankName(userData.accessLevel)}`;
-            document.getElementById('avatar-initial').innerText = userData.displayName[0].toUpperCase();
+        // --- 🚀 TERMINAL LAUNCHER ---
+        function launchTerminal() {
+            document.getElementById('load-progress').style.width = "100%";
+            setTimeout(() => {
+                document.getElementById('app-loader').style.opacity = "0";
+                document.getElementById('core-interface').classList.remove('opacity-0');
+                setTimeout(() => document.getElementById('app-loader').remove(), 500);
+                
+                // Set UI Details
+                document.getElementById('op-name').innerText = currentOperator.displayName;
+                document.getElementById('op-rank').innerText = `RANK ${currentOperator.accessLevel} // ${getRankName(currentOperator.accessLevel)}`;
+                
+                applyPermissions(currentOperator.accessLevel);
+                fetchNodeStats();
+                initCharts();
+            }, 800);
+        }
 
-            checkPermissions();
-            initCharts();
-            loadUsers();
-            
-            // Dashboard auto-detecting real counts
-            db.collection("users").onSnapshot(snap => {
-                document.getElementById('stat-users').innerText = snap.size;
+        function getRankName(r) {
+            return {10:"CEO", 9:"BOARD", 8:"SUPER ADMIN", 7:"ADMIN"}[r] || "OPERATOR";
+        }
+
+        function applyPermissions(level) {
+            document.querySelectorAll('[data-rank]').forEach(el => {
+                if (level >= parseInt(el.dataset.rank)) el.classList.remove('hidden-node');
             });
         }
 
-        function getRankName(level) {
-            const ranks = { 10: "CEO", 9: "BOARD", 8: "SUPER ADMIN", 7: "ADMIN", 6: "OPS MGR", 5: "CONTENT", 4: "MOD", 3: "SUPPORT", 2: "ANALYST", 1: "INTERN" };
-            return ranks[level] || "OPERATOR";
-        }
+        async function fetchNodeStats() {
+            // Fetch IP for Node Tracking
+            const ipData = await fetch('https://api.ipify.org?format=json').then(r => r.json());
+            document.getElementById('node-ip').innerText = ipData.ip;
 
-        function checkPermissions() {
-            document.querySelectorAll('[data-role-required]').forEach(el => {
-                const minRole = parseInt(el.getAttribute('data-role-required'));
-                if (userData.accessLevel >= minRole) el.style.display = 'block';
-                else el.remove();
-            });
-        }
-
-        function switchPage(pageId) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('sidebar-active', 'text-white'));
-            event.currentTarget.classList.add('sidebar-active', 'text-white');
-        }
-
-        function loadUsers() {
-            db.collection("users").limit(10).onSnapshot(snap => {
-                const container = document.getElementById('user-table-body');
-                container.innerHTML = '';
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    container.innerHTML += `
-                        <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
-                            <td class="px-6 py-4 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded bg-blue-600/20 text-blue-500 flex items-center justify-center text-[10px] font-bold">${u.displayName[0]}</div>
-                                <div>
-                                    <p class="font-bold">${u.displayName}</p>
-                                    <p class="text-[10px] text-slate-500">${u.email}</p>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4"><span class="px-2 py-1 bg-blue-500/10 text-blue-500 rounded text-[10px] font-bold uppercase tracking-widest">Rank ${u.accessLevel}</span></td>
-                            <td class="px-6 py-4 font-mono text-xs text-slate-500">${u.platform || 'HEM Cloud'}</td>
-                            <td class="px-6 py-4 text-xs text-slate-400">${u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Inactive'}</td>
-                            <td class="px-6 py-4 text-right">
-                                <button onclick="openEditModal('${doc.id}')" class="text-slate-500 hover:text-white"><i class="fa-solid fa-ellipsis-v"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                });
+            // Live Revenue Stream
+            db.collection("revenue").onSnapshot(snap => {
+                let total = 0;
+                snap.forEach(doc => total += doc.data().amount);
+                document.getElementById('rev-display').innerText = `$${total.toLocaleString()}`;
             });
         }
 
         function initCharts() {
-            const ctx = document.getElementById('growthChart').getContext('2d');
-            if (growthChart) growthChart.destroy();
-            
-            growthChart = new Chart(ctx, {
+            const ctx = document.getElementById('mainGrowthChart').getContext('2d');
+            new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [{
-                        label: 'Core Utilization',
-                        data: [65, 59, 80, 81, 56, 95],
+                        label: 'H.E.M. Network Throughput',
+                        data: [400, 600, 550, 900, 1200, 1100, 1500],
                         borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
                         tension: 0.4,
-                        borderWidth: 3,
-                        pointRadius: 0
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.05)'
                     }]
                 },
                 options: {
@@ -344,44 +237,21 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } },
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } }
+                        y: { grid: { color: 'rgba(255,255,255,0.02)' }, ticks: { color: '#444' } },
+                        x: { grid: { display: false }, ticks: { color: '#444' } }
                     }
                 }
             });
         }
 
-        function openEditModal(uid) {
-            if(userData.accessLevel < 8) return alert("CORE: Authority level 8 required for manual override.");
-            const container = document.getElementById('modal-container');
-            const content = document.getElementById('modal-content');
-            
-            content.innerHTML = `
-                <h3 class="text-xl font-bold mb-4">Edit Operator Authority</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-2">New Rank (1-10)</label>
-                        <input type="number" id="new-rank" class="w-full bg-black/40 border border-slate-700 rounded p-2" placeholder="Enter level">
-                    </div>
-                    <div class="flex gap-2 justify-end mt-6">
-                        <button onclick="closeModal()" class="px-4 py-2 text-xs font-bold text-slate-500 uppercase">Cancel</button>
-                        <button onclick="updateRank('${uid}')" class="bg-blue-600 px-6 py-2 rounded-lg text-xs font-bold">COMMIT CHANGE</button>
-                    </div>
-                </div>
-            `;
-            container.classList.remove('hidden');
+        function nav(page) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('sidebar-active'));
+            event.currentTarget.classList.add('sidebar-active');
+            document.getElementById('page-title').innerText = page.charAt(0).toUpperCase() + page.slice(1);
         }
 
-        function closeModal() {
-            document.getElementById('modal-container').classList.add('hidden');
-        }
-
-        async function updateRank(uid) {
-            const level = document.getElementById('new-rank').value;
-            if(!level) return;
-            await db.collection("users").doc(uid).update({ accessLevel: parseInt(level) });
-            closeModal();
-        }
+        // --- ⚡ START ENGINE ---
+        window.onload = authenticate;
     </script>
 </body>
 </html>
