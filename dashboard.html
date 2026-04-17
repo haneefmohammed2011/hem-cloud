@@ -3,190 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.E.M. CORE | CEO LEVEL 10</title>
+    <title>H.E.M. CORE | COMMAND v2.7</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --accent: #007aff; --void: #020617; --glass: rgba(15, 23, 42, 0.8); }
-        body { background-color: #000; color: #fff; font-family: 'SF Pro Display', -apple-system, sans-serif; overflow: hidden; height: 100vh; }
-        .glass { background: var(--glass); backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.1); }
-        .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; transition: 0.3s; }
-        .card:hover { border-color: var(--accent); background: rgba(255,255,255,0.05); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .mono { font-family: 'SF Mono', 'Fira Code', monospace; }
+        :root { 
+            --orange: #ff5722; --bg: #050505; --sidebar: #0a0a0a;
+            --card: rgba(20, 20, 20, 0.6); --border: rgba(255, 255, 255, 0.05);
+            --text-main: #e2e8f0; --text-dim: #888;
+        }
+
+        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        .glass-panel { background: var(--card); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 12px; }
+        .sidebar { background: var(--sidebar); border-right: 1px solid var(--border); }
         
-        /* TERMINAL TEXT ANIMATION */
-        @keyframes blink { 50% { opacity: 0; } }
-        .cursor { display: inline-block; width: 8px; height: 15px; background: var(--accent); animation: blink 1s infinite; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; font-size: 11px; font-weight: 700; color: var(--text-dim); transition: 0.2s; width: 100%; text-align: left; text-transform: uppercase; letter-spacing: 0.05em; }
+        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.03); }
+        .nav-item.active { color: #fff; background: rgba(255,87,34,0.1); border-left: 3px solid var(--orange); }
+
+        .view-panel { display: none; height: 100%; animation: fadeIn 0.4s ease; }
+        .view-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .kpi-card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; }
+        .orange-text { color: var(--orange); }
+        .mono { font-family: 'SF Mono', 'Fira Code', monospace; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        input, select { background: rgba(255,255,255,0.03) !important; border: 1px solid var(--border) !important; border-radius: 8px; padding: 10px; font-size: 12px; color: white; outline: none; }
+        input:focus { border-color: var(--orange) !important; }
     </style>
 </head>
-<body class="flex">
+<body class="flex opacity-0 transition-opacity duration-700" id="app-body">
 
-    <aside class="w-72 glass h-screen flex flex-col p-6 z-50">
-        <div class="mb-10 px-2 flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black italic shadow-lg shadow-blue-500/20">H</div>
-            <div>
-                <h1 class="text-sm font-black tracking-tight uppercase">H.E.M. CORE</h1>
-                <div class="flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">v1.5.0 STABLE</span>
-                </div>
+    <aside class="w-64 sidebar flex flex-col p-6 h-full z-50">
+        <div class="flex items-center gap-3 mb-12 px-2">
+            <div class="w-8 h-8 bg-[#ff5722] rounded flex items-center justify-center">
+                <i class="fa-solid fa-layer-group text-black text-xs"></i>
             </div>
+            <h1 class="text-xs font-black tracking-[0.2em] uppercase">HEM AFRICA</h1>
         </div>
 
         <nav class="flex-1 space-y-1 overflow-y-auto no-scrollbar">
-            <p class="text-[10px] font-bold text-slate-600 uppercase mb-4 px-2">Mainframe</p>
-            <button onclick="showTab('dash')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition text-sm font-medium text-slate-400 hover:text-white">
-                <i class="fa-solid fa-gauge-high"></i> Executive View
-            </button>
-            
-            <p class="text-[10px] font-bold text-slate-600 uppercase mt-8 mb-4 px-2">Ecosystem</p>
-            <button onclick="showTab('cinexa')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition text-sm font-medium text-slate-400 hover:text-white">
-                <i class="fa-solid fa-play"></i> Cinexa+ Admin
-            </button>
-            <button onclick="showTab('pinglo')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition text-sm font-medium text-slate-400 hover:text-white">
-                <i class="fa-solid fa-hashtag"></i> Pinglo Mods
-            </button>
-            
-            <p class="text-[10px] font-bold text-slate-600 uppercase mt-8 mb-4 px-2">Access Level: <span id="lvl-display" class="text-blue-500">10</span></p>
-            <select id="roleEngine" onchange="updateRBAC()" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-xs text-white outline-none">
-                <option value="1">Lvl 1 - Staff</option>
-                <option value="5">Lvl 5 - Operations</option>
-                <option value="10" selected>Lvl 10 - CEO</option>
-            </select>
+            <button onclick="switchTab('dash')" id="btn-dash" class="nav-item active"><i class="fa-solid fa-house"></i> Dashboard</button>
+            <button onclick="switchTab('users')" id="btn-users" class="nav-item"><i class="fa-solid fa-users"></i> Users</button>
+            <button onclick="switchTab('content')" id="btn-content" class="nav-item"><i class="fa-solid fa-clapperboard"></i> Content</button>
+            <button onclick="switchTab('social')" id="btn-social" class="nav-item"><i class="fa-solid fa-message"></i> Social</button>
+            <button onclick="switchTab('cinexa')" id="btn-cinexa" class="nav-item"><i class="fa-solid fa-crown"></i> Cinexa+</button>
+            <button onclick="switchTab('staff')" id="btn-staff" class="nav-item"><i class="fa-solid fa-briefcase"></i> Staff & Ops</button>
+            <button onclick="switchTab('notifications')" id="btn-notifications" class="nav-item"><i class="fa-solid fa-bell"></i> Notifications</button>
+            <button onclick="switchTab('logs')" id="btn-logs" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Security Logs</button>
+            <button onclick="switchTab('settings')" id="btn-settings" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</button>
         </nav>
 
-        <div class="mt-auto card p-4 bg-blue-600/5 border-blue-500/20">
-            <p class="text-[10px] font-black text-blue-500 uppercase">Haneef Mohammed</p>
-            <p class="text-[9px] text-slate-500 font-bold uppercase mt-1 italic">Founding Director</p>
+        <div class="mt-auto pt-6 border-t border-white/5">
+            <div class="bg-white/5 rounded-xl p-4 flex items-center gap-3 border border-white/5">
+                <div class="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center text-[10px] font-black">HM</div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-bold truncate">Haneef Mohammed</p>
+                    <p class="text-[9px] text-slate-500 font-bold uppercase">Group CEO</p>
+                </div>
+            </div>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col overflow-y-auto bg-black no-scrollbar">
-        <header class="h-24 border-b border-white/5 flex items-center justify-between px-10 sticky top-0 bg-black/50 backdrop-blur-xl z-40">
-            <div>
-                <h2 id="view-title" class="text-xl font-black uppercase tracking-tight">Mainframe Controller</h2>
-                <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">London Node: eu-west-2</p>
+    <main class="flex-1 flex flex-col overflow-hidden bg-[#050505]">
+        <header class="h-16 border-b border-white/5 flex items-center justify-between px-10">
+            <div class="flex items-center gap-4 bg-white/5 px-4 py-2 rounded-lg border border-white/5 w-[450px]">
+                <i class="fa-solid fa-magnifying-glass text-slate-600 text-sm"></i>
+                <input type="text" id="global-search" onkeyup="handleSearch()" placeholder="Search ecosystem entities..." class="bg-transparent border-none outline-none text-xs w-full">
             </div>
-            
-            <div class="flex gap-4">
-                <button onclick="runCommand('reboot')" data-level="10" class="px-5 py-2.5 card bg-red-600/10 border-red-500/30 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white">
-                    Emergency Reboot
-                </button>
+            <div class="text-[10px] font-bold text-orange-500 uppercase tracking-widest flex items-center gap-2">
+                <span class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></span> Core Systems Active
             </div>
         </header>
 
-        <div class="p-10 space-y-8">
-            <div id="tab-dash" class="tab-content space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="card p-6"><p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Total Rev</p><h3 class="text-2xl font-black">$1.4M</h3></div>
-                    <div class="card p-6"><p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Active Users</p><h3 class="text-2xl font-black">12.4k</h3></div>
-                    <div class="card p-6" data-level="10"><p class="text-[10px] font-bold text-slate-500 uppercase mb-2">EC2 CPU</p><h3 id="cpu-stat" class="text-2xl font-black text-blue-500">4.1%</h3></div>
-                    <div class="card p-6"><p class="text-[10px] font-bold text-slate-500 uppercase mb-2">System Health</p><h3 class="text-2xl font-black text-emerald-500">Online</h3></div>
+        <div class="flex-1 overflow-y-auto p-10 no-scrollbar">
+            
+            <section id="view-dash" class="view-panel active space-y-8">
+                <div>
+                    <h2 class="text-3xl font-black italic tracking-tighter uppercase">Executive <span class="orange-text">Matrix</span></h2>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Global H.E.M. Operational Pulse</p>
                 </div>
-
-                <div data-level="10" class="card bg-black border-blue-500/30 overflow-hidden flex flex-col h-[400px]">
-                    <div class="px-5 py-3 bg-white/5 border-b border-white/5 flex justify-between items-center">
-                        <span class="text-[10px] font-black text-blue-500 uppercase mono tracking-tighter italic">H.E.M. Neural Terminal</span>
-                        <span class="text-[9px] text-slate-600 mono">auth_token: class_a_verified</span>
+                <div class="grid grid-cols-5 gap-4">
+                    <div class="kpi-card"><p class="text-[9px] font-black text-slate-500 uppercase">Total Users</p><h3 id="stat-total-users" class="text-2xl font-black mt-1">0</h3></div>
+                    <div class="kpi-card"><p class="text-[9px] font-black text-slate-500 uppercase">Subscribers</p><h3 id="stat-subs" class="text-2xl font-black text-emerald-500 mt-1">0</h3></div>
+                    <div class="kpi-card"><p class="text-[9px] font-black text-slate-500 uppercase">Total Content</p><h3 id="stat-content" class="text-2xl font-black mt-1">0</h3></div>
+                    <div class="kpi-card"><p class="text-[9px] font-black text-slate-500 uppercase">Staff Count</p><h3 id="stat-staff" class="text-2xl font-black text-orange-500 mt-1">0</h3></div>
+                    <div class="kpi-card bg-orange-500/5"><p class="text-[9px] font-black text-orange-500 uppercase">Active Alerts</p><h3 id="stat-alerts" class="text-2xl font-black mt-1 text-orange-500">0</h3></div>
+                </div>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="glass-panel p-6">
+                        <p class="text-[10px] font-black uppercase text-slate-500 mb-4">Live Access Stream</p>
+                        <div id="dash-logs" class="space-y-2 mono text-[9px] text-slate-400"></div>
                     </div>
-                    <div id="term-out" class="flex-1 p-6 overflow-y-auto mono text-xs text-blue-400 space-y-1 no-scrollbar">
-                        <p class="text-slate-500">>> H.E.M Core OS v1.5.0 Initialized...</p>
-                        <p class="text-slate-500">>> Handshake with eu-west-2 established.</p>
-                    </div>
-                    <div class="p-4 bg-white/[0.02] flex items-center gap-3">
-                        <span class="text-blue-500 font-bold mono">CEO@HEM:~$</span>
-                        <input type="text" id="term-in" class="bg-transparent border-none outline-none text-white flex-1 mono text-xs" placeholder="Execute command...">
+                    <div class="glass-panel p-6">
+                        <p class="text-[10px] font-black uppercase text-slate-500 mb-4">Cinexa+ Revenue Estimate</p>
+                        <h4 id="dash-rev" class="text-3xl font-black tracking-tighter">$0.00</h4>
+                        <p class="text-[9px] text-emerald-500 mt-2 font-bold uppercase tracking-widest">Calculated from cinexa-users</p>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div id="tab-cinexa" class="tab-content hidden"><h1 class="text-2xl font-black">Cinexa+ Content Manager</h1></div>
-            <div id="tab-pinglo" class="tab-content hidden"><h1 class="text-2xl font-black">Pinglo Social Moderator</h1></div>
+            <section id="view-users" class="view-panel space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-black italic tracking-tighter uppercase">User <span class="orange-text">Command</span></h2>
+                </div>
+                <div class="glass-panel overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-white/5 text-[10px] font-black text-slate-500 uppercase">
+                            <tr><th class="p-5">Identity</th><th class="p-5">Platform</th><th class="p-5">Status</th><th class="p-5 text-right">Action</th></tr>
+                        </thead>
+                        <tbody id="user-table" class="text-[11px] divide-y divide-white/[0.03]"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="view-staff" class="view-panel space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-black italic tracking-tighter uppercase">Staff <span class="orange-text">Operations</span></h2>
+                    <button onclick="toggleModal('staff-modal')" class="bg-orange-500 text-black px-4 py-2 rounded font-black text-[10px] uppercase hover:bg-white transition-colors">+ New Employee</button>
+                </div>
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 col-span-2">
+                        <p class="text-[10px] font-black uppercase text-slate-500 mb-4">Attendance Log (Today)</p>
+                        <div id="staff-attendance" class="space-y-3"></div>
+                    </div>
+                    <div class="glass-panel p-6">
+                        <p class="text-[10px] font-black uppercase text-slate-500 mb-4">Task Tracking</p>
+                        <div id="staff-tasks" class="space-y-4"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-logs" class="view-panel space-y-6">
+                <h2 class="text-2xl font-black italic tracking-tighter uppercase">Security <span class="orange-text">Audit</span></h2>
+                <div class="glass-panel p-6 mono text-[10px] text-slate-500 space-y-1" id="full-security-logs"></div>
+            </section>
+
         </div>
     </main>
 
-    <script>
-        const LAMBDA_URL = 'https://4brozf732fjjkfd6i7y3sz3rcm0ydiey.lambda-url.eu-west-2.on.aws/';
-        const CEO_KEY = 'YOUR_SECRET_CEO_KEY'; // Change this to your actual key
+    <div id="staff-modal" class="fixed inset-0 bg-black/90 z-[100] hidden flex items-center justify-center p-10">
+        <div class="glass-panel w-full max-w-2xl p-10 border-orange-500/20">
+            <h3 class="text-xl font-black uppercase italic mb-6">Provision <span class="orange-text">New Personnel</span></h3>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <p class="text-[10px] font-black text-slate-500 uppercase">Identification</p>
+                    <input type="text" id="new-staff-name" placeholder="Full Name" class="w-full">
+                    <input type="email" id="new-staff-email" placeholder="Corporate Email" class="w-full">
+                    <select id="new-staff-role" class="w-full">
+                        <option value="Manager">Regional Manager</option>
+                        <option value="Developer">Systems Architect</option>
+                        <option value="Moderator">Content Safety</option>
+                    </select>
+                </div>
+                <div class="space-y-4">
+                    <p class="text-[10px] font-black text-orange-500 uppercase">AWS Cognito Security</p>
+                    <input type="text" id="aws-pool-id" placeholder="User Pool ID" class="w-full" value="us-east-1_hem_main">
+                    <input type="text" id="aws-client-id" placeholder="App Client ID" class="w-full">
+                    <div class="flex gap-4">
+                        <button onclick="saveStaff()" class="flex-1 bg-orange-500 text-black py-3 rounded font-black text-xs uppercase">Deploy to Cloud</button>
+                        <button onclick="toggleModal('staff-modal')" class="flex-1 bg-white/5 py-3 rounded font-black text-xs uppercase">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // --- TAB ENGINE ---
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            document.getElementById('view-title').innerText = tabId.toUpperCase() + ' Operations';
-        }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, query, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // --- RBAC ENGINE ---
-        function updateRBAC() {
-            const level = parseInt(document.getElementById('roleEngine').value);
-            document.getElementById('lvl-display').innerText = level;
-            document.querySelectorAll('[data-level]').forEach(el => {
-                const req = parseInt(el.getAttribute('data-level'));
-                el.style.display = level >= req ? 'block' : 'none';
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlhFnMp9AKuv9HS-gbON5d3k6I3YePOXA",
+            authDomain: "hem-platform.firebaseapp.com",
+            projectId: "hem-platform",
+            storageBucket: "hem-platform.firebasestorage.app",
+            messagingSenderId: "846707696620",
+            appId: "1:846707696620:web:45351054faf95b179816c9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- SPA NAVIGATION ---
+        window.switchTab = (id) => {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(`view-${id}`).classList.add('active');
+            document.getElementById(`btn-${id}`).classList.add('active');
+        };
+
+        window.toggleModal = (id) => {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        };
+
+        // --- GLOBAL SYNC ENGINE ---
+        function runSystemSync() {
+            // Dashboard Totals
+            onSnapshot(collection(db, "users"), snap => {
+                const totalUsers = snap.size;
+                onSnapshot(collection(db, "cinexa-users"), cSnap => {
+                    document.getElementById('stat-total-users').innerText = (totalUsers + cSnap.size).toLocaleString();
+                    document.getElementById('stat-subs').innerText = cSnap.size.toLocaleString();
+                    document.getElementById('dash-rev').innerText = `$${(cSnap.size * 9.99).toLocaleString()}`;
+                    renderUserTable(snap.docs, cSnap.docs);
+                });
+            });
+
+            onSnapshot(collection(db, "posts"), pSnap => {
+                onSnapshot(collection(db, "articles"), aSnap => {
+                    document.getElementById('stat-content').innerText = (pSnap.size + aSnap.size).toLocaleString();
+                });
+            });
+
+            onSnapshot(collection(db, "hem_staff"), snap => {
+                document.getElementById('stat-staff').innerText = snap.size;
+                renderStaffLogs(snap);
+            });
+
+            onSnapshot(query(collection(db, "hem_access_logs"), limit(10), orderBy("timestamp", "desc")), snap => {
+                const logContainer = document.getElementById('dash-logs');
+                const fullLog = document.getElementById('full-security-logs');
+                logContainer.innerHTML = '';
+                fullLog.innerHTML = '';
+                snap.forEach(doc => {
+                    const l = doc.data();
+                    const entry = `<div><span class="text-orange-500">[AUTH]</span> ${l.user} accessed ${l.module} via ${l.action}</div>`;
+                    logContainer.innerHTML += entry;
+                    fullLog.innerHTML += entry;
+                });
             });
         }
 
-        // --- TERMINAL & AWS ENGINE ---
-        const termIn = document.getElementById('term-in');
-        const termOut = document.getElementById('term-out');
+        // --- STAFF ONBOARDING ---
+        window.saveStaff = async () => {
+            const name = document.getElementById('new-staff-name').value;
+            const email = document.getElementById('new-staff-email').value;
+            const role = document.getElementById('new-staff-role').value;
+            
+            if(!name || !email) return alert("Missing Personnel Data");
 
-        const print = (text, type = 'info') => {
-            const p = document.createElement('p');
-            p.className = type === 'err' ? 'text-red-500' : (type === 'ok' ? 'text-emerald-500' : 'text-blue-400');
-            p.innerHTML = `<span class="text-slate-700">>></span> ${text}`;
-            termOut.appendChild(p);
-            termOut.scrollTop = termOut.scrollHeight;
+            await addDoc(collection(db, "hem_staff"), {
+                name, email, role, 
+                status: 'Provisioned', 
+                accessLevel: 5,
+                joined: serverTimestamp()
+            });
+
+            await addDoc(collection(db, "hem_access_logs"), {
+                user: "CEO_HANEEF",
+                action: "STAFF_PROVISION",
+                module: "HEM_CORE_V2",
+                timestamp: serverTimestamp()
+            });
+
+            toggleModal('staff-modal');
+            alert(`Provisioning ${name} to Cloud Registry...`);
         };
 
-        async function runCommand(cmd) {
-            print(`<span class="text-white">${cmd}</span>`);
-            
-            if (cmd === 'reboot') {
-                print("INITIATING SECURE AWS REBOOT CALL...");
-                try {
-                    // SET TIMEOUT TO PREVENT GATEWAY ERRORS
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-                    const res = await fetch(LAMBDA_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ token: CEO_KEY, action: 'REBOOT' }),
-                        signal: controller.signal
-                    });
-                    
-                    if (res.ok) print("SUCCESS: EC2 reboot command accepted.", "ok");
-                    else print("FAILED: AWS Lambda returned error code.", "err");
-                    
-                } catch (e) {
-                    print("GATEWAY TIMEOUT: Server is likely already rebooting or Lambda is warming up.", "err");
-                }
-            } else if (cmd === 'help') {
-                print("Commands: reboot | status | clear | users");
-            } else if (cmd === 'clear') {
-                termOut.innerHTML = '';
-            } else {
-                print("Unknown command sequence.", "err");
-            }
+        // --- RENDERERS ---
+        function renderUserTable(users, cinexa) {
+            const tbody = document.getElementById('user-table');
+            tbody.innerHTML = '';
+            [...users, ...cinexa].slice(0, 15).forEach(doc => {
+                const u = doc.data();
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/[0.01]">
+                        <td class="p-5 font-bold">
+                            <div class="text-main">${u.name || u.email}</div>
+                            <div class="text-[9px] text-slate-500 mono">${doc.id.substring(0,8)}...</div>
+                        </td>
+                        <td class="p-5 text-[9px] font-black uppercase text-slate-400">${u.platform || 'Pinglo'}</td>
+                        <td class="p-5"><span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase">Active</span></td>
+                        <td class="p-5 text-right"><button class="text-orange-500 font-bold hover:underline">Inspect</button></td>
+                    </tr>
+                `;
+            });
         }
 
-        termIn.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                runCommand(termIn.value.toLowerCase().trim());
-                termIn.value = '';
-            }
-        });
+        function renderStaffLogs(snap) {
+            const att = document.getElementById('staff-attendance');
+            att.innerHTML = '';
+            snap.forEach(doc => {
+                const s = doc.data();
+                att.innerHTML += `
+                    <div class="flex items-center justify-between p-3 glass-panel bg-white/[0.01]">
+                        <div><p class="text-xs font-bold">${s.name}</p><p class="text-[9px] text-slate-600 font-black uppercase">${s.role}</p></div>
+                        <span class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Clocked In</span>
+                    </div>
+                `;
+            });
+        }
 
-        // LIVE STATS SIMULATION
-        setInterval(() => {
-            const cpu = (Math.random() * (5 - 2) + 2).toFixed(1);
-            document.getElementById('cpu-stat').innerText = cpu + '%';
-        }, 3000);
-
-        // INIT
-        updateRBAC();
+        // BOOT
+        document.getElementById('app-body').style.opacity = '1';
+        runSystemSync();
     </script>
 </body>
 </html>
