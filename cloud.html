@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>H.E.M. | Cloud Status</title>
+    <style>
+        body { background: #050b14; color: white; font-family: monospace; padding: 50px; }
+        .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .stat-card { border: 1px solid #1e293b; padding: 30px; background: #0a101f; }
+        .val { font-size: 2rem; color: #00ff88; font-weight: bold; margin-top: 10px; }
+        .label { color: #64748b; font-size: 12px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <h2 style="margin-bottom: 40px;">GLOBAL_INFRASTRUCTURE_REPORT</h2>
+    <div class="status-grid">
+        <div class="stat-card">
+            <div class="label">AWS Region</div>
+            <div class="val">eu-west-2</div>
+            <p style="font-size: 10px; margin-top: 5px;">London, UK Node</p>
+        </div>
+        <div class="stat-card">
+            <div class="label">SSO Node Status</div>
+            <div class="val" style="color: #003399;">ACTIVE</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">System Uptime</div>
+            <div class="val">99.98%</div>
+        </div>
+    </div>
+    <div style="margin-top: 40px; border: 1px solid #1e293b; padding: 20px;">
+        <div class="label">Instance ID</div>
+        <div>i-003dc55bdcf82a36d (HEM-Main-Server)</div>
+    </div>
+</body>
+</html>
