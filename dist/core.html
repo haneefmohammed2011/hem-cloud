@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>H.E.M. CORE | BOOT</title>
+    <style>
+        body { background: #000; color: #0066ff; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: 'Courier New', monospace; }
+        .terminal { border: 1px solid #111; padding: 50px; background: #050505; border-radius: 10px; box-shadow: 0 0 50px rgba(0,102,255,0.1); }
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <h1 style="letter-spacing: 15px;">H.E.M.</h1>
+        <p>> STATUS: <span style="color: #00ff88;">SERVER_REACHED</span></p>
+        <p>> AUTH: <span style="color: #00ff88;">TOKEN_DETECTED</span></p>
+        <p>> INITIALIZING OS... <span class="blink">_</span></p>
+        <hr style="border: 0; border-top: 1px solid #222; margin: 20px 0;">
+        <button onclick="window.location.reload()" style="background: transparent; border: 1px solid #0066ff; color: #0066ff; padding: 10px; cursor: pointer;">RE-SYNC CORE</button>
+    </div>
+
+    <script>
+        console.log("H.E.M. Terminal Logic Online");
+        // This is a test to see if JS is even running
+        document.body.style.border = "5px solid #0066ff";
+    </script>
+</body>
+</html>

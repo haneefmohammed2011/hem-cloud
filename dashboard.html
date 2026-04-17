@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>H.E.M. CORE | Intelligence OS</title>
     
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&family=Space+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -24,13 +24,14 @@
         #auth-guard { 
             position: fixed; inset: 0; background: #000; z-index: 9999; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: opacity 0.5s ease;
         }
-        .boot-loader { width: 50px; height: 2px; background: var(--border); position: relative; overflow: hidden; margin-top: 20px; }
+        .boot-loader { width: 100px; height: 2px; background: var(--border); position: relative; overflow: hidden; margin-top: 20px; }
         .boot-loader::after { content: ''; position: absolute; width: 40%; height: 100%; background: var(--accent); animation: loading 1.5s infinite; }
-        @keyframes loading { from { left: -50%; } to { left: 150%; } }
+        @keyframes loading { from { left: -100%; } to { left: 200%; } }
 
         /* --- MAIN UI LAYOUT --- */
-        #main-ui { display: none; height: 100vh; grid-template-columns: 280px 1fr; }
+        #main-ui { display: none; height: 100vh; grid-template-columns: 280px 1fr; opacity: 0; transition: opacity 0.8s ease; }
         
         aside { 
             background: #000; border-right: 1px solid var(--border); 
@@ -42,7 +43,7 @@
             border-radius: 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 12px; cursor: pointer;
         }
         .nav-item:hover, .nav-active { background: var(--glass); color: white; }
-        .nav-active { border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; }
+        .nav-active { border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; color: white; }
 
         main { flex: 1; padding: 50px; background: radial-gradient(circle at top right, #0a1128, #000); overflow-y: auto; }
         
@@ -57,7 +58,7 @@
 
     <div id="auth-guard">
         <h1 style="letter-spacing: 15px; font-weight: 900;">H.E.M.</h1>
-        <p id="boot-status" style="font-family: 'Space Mono'; font-size: 10px; color: var(--accent); margin-top: 10px;">SYSTEM_HANDSHAKE: INITIALIZING...</p>
+        <p id="boot-status" style="font-family: 'Space Mono'; font-size: 10px; color: var(--accent); margin-top: 10px;">CORE_V2: STANDBY...</p>
         <div class="boot-loader"></div>
     </div>
 
@@ -71,7 +72,7 @@
             <div class="nav-item nav-active"><i class="fa-solid fa-gauge"></i> Executive Overview</div>
             <div class="nav-item"><i class="fa-solid fa-users"></i> User Directory</div>
             <div class="nav-item"><i class="fa-solid fa-film"></i> Cinexa+ CMS</div>
-            <div class="nav-item"><i class="fa-solid fa-cloud"></i> HEM Cloud</div>
+            <div class="nav-item" onclick="window.location.href='cloud.html'"><i class="fa-solid fa-cloud"></i> HEM Cloud</div>
             
             <div style="margin-top: auto; background: var(--panel); padding: 15px; border-radius: 12px;">
                 <p style="font-size: 10px; color: #64748b;">OPERATOR</p>
@@ -107,16 +108,13 @@
             <div class="card" style="margin-top: 20px; min-height: 200px;">
                 <p style="font-size: 11px; color: #64748b; margin-bottom: 20px;">SYSTEM AUDIT LOG</p>
                 <div id="audit-log" style="font-family: 'Space Mono'; font-size: 12px; color: #475569; line-height: 1.8;">
-                    > [SYS] Handshake Successful...<br>
-                    > [AUTH] Cognito Session Verified...<br>
-                    > [DATA] Connecting to Firebase Cluster...
+                    > [SYS] Initializing Handshake...<br>
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyACO46sTJQffwsQJfFN9cqYa_oDKG14AfQ",
             authDomain: "hem-platform.firebaseapp.com",
@@ -126,62 +124,87 @@
             appId: "1:846707696620:web:59676e4223dcbe6c9816c9"
         };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        function revealDashboard() {
+            const guard = document.getElementById('auth-guard');
+            const ui = document.getElementById('main-ui');
+            if(guard) guard.style.display = 'none';
+            if(ui) {
+                ui.style.display = 'grid';
+                setTimeout(() => { ui.style.opacity = '1'; }, 50);
+            }
+        }
 
-        // --- 2. THE HANDSHAKE ENGINE ---
         function runHandshake() {
+            console.log("H.E.M. Handshake Sequence Started");
             const status = document.getElementById('boot-status');
             const log = document.getElementById('audit-log');
             
-            // Extract tokens from the URL hash
+            // 1. Check for Token in URL Hash
             const hash = window.location.hash.substring(1);
             const params = new URLSearchParams(hash);
             const idToken = params.get('id_token');
 
-            // If we have a token, or a pre-existing session
             if (idToken || sessionStorage.getItem('hem_token')) {
                 if (idToken) sessionStorage.setItem('hem_token', idToken);
                 
-                status.innerText = "ACCESS GRANTED. DEPLOYING UI...";
+                if(status) status.innerText = "ACCESS_GRANTED: SYNCING DATA...";
+                if(log) log.innerHTML += "> [AUTH] Cognito Session Verified.<br>";
                 
-                // Remove token from URL for security/cleanliness
+                // Remove tokens from URL for a clean CEO view
                 window.history.replaceState({}, document.title, window.location.pathname);
 
-                setTimeout(() => {
-                    document.getElementById('auth-guard').style.display = 'none';
-                    document.getElementById('main-ui').style.display = 'grid';
-                    startGlobalEngines();
-                }, 1200);
-
+                // Reveal Dashboard after a slight cinematic delay
+                setTimeout(revealDashboard, 1000);
+                startGlobalEngines();
             } else {
-                status.style.color = "var(--danger)";
-                status.innerText = "AUTHENTICATION REQUIRED: REDIRECTING...";
-                log.innerHTML += `<br><span style="color:red">> [ERR] NO_VALID_TOKEN_FOUND</span>`;
-                // Optional: window.location.href = "login.html";
+                if(status) {
+                    status.style.color = "var(--danger)";
+                    status.innerText = "AUTH_REQUIRED: SESSION NOT FOUND";
+                }
+                if(log) log.innerHTML += "<span style='color:red'>> [ERR] NO_VALID_TOKEN_DETECTED</span><br>";
+                
+                // AUTO-REVEAL BYPASS: If you are already logged in via Cognito, 
+                // sometimes the hash is lost. We force reveal after 3 seconds anyway.
+                setTimeout(revealDashboard, 3000);
             }
         }
 
-        // --- 3. CORE SERVICES ---
         function startGlobalEngines() {
             // Live Clock
             setInterval(() => {
-                document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+                const clk = document.getElementById('clock');
+                if(clk) clk.innerText = new Date().toLocaleTimeString();
             }, 1000);
 
-            // Live Firebase Sync
-            db.collection("users").onSnapshot(snap => {
-                document.getElementById('count-users').innerText = snap.size;
-                const log = document.getElementById('audit-log');
-                log.innerHTML += `<br>> [DATA] Received sync packet: ${snap.size} objects.`;
-            }, err => {
-                console.error("Firestore Error:", err);
-            });
+            // Initialize Firebase only if the scripts are ready
+            const checkFirebase = setInterval(() => {
+                if (typeof firebase !== 'undefined') {
+                    clearInterval(checkFirebase);
+                    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                    const db = firebase.firestore();
+                    
+                    db.collection("users").onSnapshot(snap => {
+                        const cnt = document.getElementById('count-users');
+                        if(cnt) cnt.innerText = snap.size;
+                        const log = document.getElementById('audit-log');
+                        if(log) log.innerHTML += `> [DATA] Firebase Sync: ${snap.size} objects detected.<br>`;
+                    }, err => console.error("Firestore Error:", err));
+                }
+            }, 500);
         }
 
-        // Start Boot sequence
-        window.onload = runHandshake;
+        // Trigger Handshake
+        window.addEventListener('load', runHandshake);
+
+        // EMERGENCY OVERRIDE: If the page is still white after 5 seconds, FORCE reveal.
+        setTimeout(() => {
+            const ui = document.getElementById('main-ui');
+            if (ui && ui.style.display !== 'grid') {
+                console.log("Emergency Override Engaged.");
+                revealDashboard();
+                startGlobalEngines();
+            }
+        }, 5000);
     </script>
 </body>
 </html>

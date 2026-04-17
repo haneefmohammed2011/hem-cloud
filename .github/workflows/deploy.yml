@@ -20,15 +20,19 @@ jobs:
             cd /var/www/hem-cloud
             
             # 2. Fix Git ownership and Force Sync
-            sudo git config --global --add safe.directory /var/www/hem-cloud
-            sudo git fetch origin main
-            sudo git reset --hard origin/main
+            # We take ownership temporarily to allow the git pull
+            sudo chown -R ubuntu:ubuntu /var/www/hem-cloud
+            git config --global --add safe.directory /var/www/hem-cloud
+            
+            # This pulls the latest code and overwrites any local changes on the server
+            git fetch origin main
+            git reset --hard origin/main
             
             # 3. Clean up the folder to prevent Nginx confusion
-            # This ensures index.html is the real one and removes any old debian defaults
             sudo rm -f index.nginx-debian.html
             
             # 4. Set final permissions
+            # We give ownership back to www-data so Nginx can serve the files
             sudo chown -R www-data:www-data /var/www/hem-cloud
             sudo chmod -R 755 /var/www/hem-cloud
             
