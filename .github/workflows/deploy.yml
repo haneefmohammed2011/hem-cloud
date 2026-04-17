@@ -1,14 +1,17 @@
 name: H.E.M. Core Auto-Deploy
+
 on:
   push:
     branches:
-      - master
+      - master  # This now matches your local terminal
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
+
       - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@master
         with:
@@ -17,5 +20,5 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /var/www/html
-            git pull origin main
+            sudo git pull origin master
             sudo systemctl restart nginx
