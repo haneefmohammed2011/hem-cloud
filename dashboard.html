@@ -3,240 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.E.M. CORE | Global Admin Console</title>
-    
+    <title>H.E.M. CORE | Intelligence OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        :root {
-            --hem-navy: #050a10;
-            --hem-blue: #3B82F6;
-            --hem-glass: rgba(16, 42, 67, 0.4);
-        }
-        body { font-family: 'Inter', sans-serif; background-color: var(--hem-navy); color: #e2e8f0; }
-        .glass { background: var(--hem-glass); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        :root { --hem-navy: #050a10; --hem-blue: #3B82F6; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--hem-navy); color: #e2e8f0; overflow: hidden; }
+        .glass { background: rgba(16, 42, 67, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .sidebar-active { background: linear-gradient(90deg, var(--hem-blue) 0%, transparent 100%); border-left: 4px solid var(--hem-blue); color: white !important; }
         .mono { font-family: 'Space Mono', monospace; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .page-transition { transition: all 0.3s ease-in-out; }
-        input:focus { border-color: var(--hem-blue) !important; outline: none; }
-        .role-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase; }
-        
-        /* Rank Colors */
-        .rank-10 { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; } /* CEO */
-        .rank-7 { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid #3b82f6; } /* Admin */
-        .rank-1 { background: rgba(100, 116, 139, 0.1); color: #64748b; border: 1px solid #64748b; } /* Intern */
+        .rank-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase; border: 1px solid currentColor; }
+        #boot-screen { transition: opacity 0.8s ease; }
     </style>
 </head>
-<body class="overflow-hidden">
+<body>
 
-    <div id="auth-gate" class="fixed inset-0 z-[100] bg-[#050a10] flex items-center justify-center p-4">
-        <div class="max-w-md w-full glass p-10 rounded-[2.5rem] shadow-2xl text-center">
-            <div class="mb-8">
-                <h2 class="text-4xl font-black tracking-tighter text-white">HEM <span class="text-blue-500">CORE</span></h2>
-                <p class="text-slate-500 text-xs mt-2 mono uppercase tracking-widest">Institutional Access Only</p>
+    <div id="boot-screen" class="fixed inset-0 z-[100] bg-[#050a10] flex flex-col items-center justify-center">
+        <div class="text-center">
+            <h2 class="text-5xl font-black tracking-tighter mb-4 animate-pulse">HEM <span class="text-blue-500">CORE</span></h2>
+            <div id="boot-status" class="text-slate-500 text-[10px] mono uppercase tracking-[0.3em] mb-8">Initializing Handshake...</div>
+            <div class="w-48 h-1 bg-white/5 rounded-full overflow-hidden mx-auto">
+                <div id="boot-progress" class="bg-blue-600 h-full w-0 transition-all duration-700"></div>
             </div>
-            
-            <form id="login-form" class="space-y-4">
-                <div class="text-left">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2 mb-1 block">Work Email</label>
-                    <input type="email" id="email" required class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm transition-all" placeholder="name@hemafrica.com">
-                </div>
-                <div class="text-left">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase ml-2 mb-1 block">Access Cipher</label>
-                    <input type="password" id="password" required class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm transition-all" placeholder="••••••••">
-                </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-600/20 transition-all transform active:scale-95">AUTHENTICATE</button>
-            </form>
-            
-            <div class="mt-6 flex items-center gap-4">
-                <div class="h-px flex-1 bg-white/5"></div>
-                <span class="text-[10px] text-slate-600 font-bold">OR</span>
-                <div class="h-px flex-1 bg-white/5"></div>
-            </div>
-
-            <button onclick="loginWithAWS()" class="w-full mt-6 bg-white/5 hover:bg-white/10 text-white border border-white/10 font-semibold py-3 rounded-2xl transition-all flex items-center justify-center gap-2">
-                <i class="fa-brands fa-aws"></i> Sign in with Cognito
-            </button>
-            <p id="auth-error" class="mt-4 text-red-500 text-xs hidden"></p>
         </div>
     </div>
 
-    <div id="main-interface" class="flex h-screen w-full hidden">
+    <div id="main-os" class="flex h-screen w-full hidden opacity-0 transition-opacity duration-1000">
         
-        <aside class="w-72 bg-[#08121d] border-r border-white/5 flex flex-col z-20">
+        <aside class="w-72 bg-[#08121d] border-r border-white/5 flex flex-col">
             <div class="p-8">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white shadow-lg">H</div>
-                    <h1 class="text-xl font-black tracking-tighter italic">HEM <span class="text-blue-500">CORE</span></h1>
-                </div>
+                <h1 class="text-2xl font-black tracking-tighter italic">H.E.M <span class="text-blue-500">CORE</span></h1>
+                <p class="text-[9px] text-slate-500 mono mt-1 tracking-widest uppercase">Institutional OS v7.3</p>
             </div>
 
-            <nav class="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">
-                <p class="text-[10px] font-bold text-slate-600 uppercase mb-4 px-4 tracking-widest">Intelligence</p>
-                <button onclick="showPage('dashboard')" class="nav-link sidebar-active w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all">
-                    <i class="fa-solid fa-house-chimney text-sm"></i> <span class="text-sm font-semibold">Command Center</span>
+            <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+                <button onclick="switchPage('dashboard')" class="nav-btn sidebar-active w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-bold transition-all">
+                    <i class="fa-solid fa-gauge-high"></i> Command Center
                 </button>
-                <button data-access="7" onclick="showPage('users')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-white transition-all">
-                    <i class="fa-solid fa-users-gear text-sm"></i> <span class="text-sm font-semibold">Staff Matrix</span>
+                <button data-access="7" onclick="switchPage('staff')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-white text-sm font-bold transition-all">
+                    <i class="fa-solid fa-address-book"></i> Staff Matrix
                 </button>
-
-                <p class="text-[10px] font-bold text-slate-600 uppercase mt-8 mb-4 px-4 tracking-widest">Platforms</p>
-                <button data-access="5" onclick="showPage('cinexa')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-white transition-all">
-                    <i class="fa-solid fa-clapperboard text-sm"></i> <span class="text-sm font-semibold">Cinexa+ CMS</span>
+                <button data-access="5" onclick="switchPage('cinexa')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-white text-sm font-bold transition-all">
+                    <i class="fa-solid fa-film"></i> Cinexa+ Studio
                 </button>
-                <button data-access="4" onclick="showPage('pinglo')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-white transition-all">
-                    <i class="fa-solid fa-comment-dots text-sm"></i> <span class="text-sm font-semibold">Pinglo Social</span>
-                </button>
-                <button data-access="6" onclick="showPage('cloud')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-white transition-all">
-                    <i class="fa-solid fa-cloud text-sm"></i> <span class="text-sm font-semibold">HEM Cloud</span>
-                </button>
-
-                <div data-access="9" class="mt-8 border-t border-white/5 pt-4">
-                    <p class="text-[10px] font-bold text-red-500/50 uppercase mb-4 px-4 tracking-widest">System Root</p>
-                    <button onclick="showPage('logs')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-red-400 transition-all">
-                        <i class="fa-solid fa-terminal text-sm"></i> <span class="text-sm font-semibold">Security Logs</span>
-                    </button>
-                </div>
             </nav>
 
             <div class="p-6 bg-[#0a1824] border-t border-white/5">
                 <div class="flex items-center gap-4">
-                    <div id="user-avatar" class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-600/20">H</div>
+                    <div id="u-avatar" class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold shadow-lg">H</div>
                     <div class="flex-1 overflow-hidden">
-                        <p id="user-name" class="text-sm font-bold truncate text-white">---</p>
-                        <p id="user-rank" class="text-[9px] font-bold mono text-blue-400 uppercase tracking-tighter">Rank --</p>
+                        <p id="u-name" class="text-xs font-bold truncate">---</p>
+                        <p id="u-rank" class="text-[8px] mono text-blue-400 font-bold uppercase tracking-tighter">RANK --</p>
                     </div>
-                    <button onclick="signOut()" class="text-slate-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-right-from-bracket"></i></button>
                 </div>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-hidden relative">
-            
-            <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 z-10 glass">
-                <h2 id="view-title" class="text-lg font-bold tracking-tight">Executive Overview</h2>
-                <div class="flex items-center gap-6">
-                    <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Node: Ilorin Alpha</span>
-                    </div>
-                    <i class="fa-solid fa-bell text-slate-500 cursor-pointer hover:text-white"></i>
-                    <i class="fa-solid fa-gear text-slate-500 cursor-pointer hover:text-white"></i>
-                </div>
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 glass">
+                <h2 id="view-title" class="text-lg font-bold">Executive Overview</h2>
+                <div id="node-id" class="text-[9px] mono text-blue-500/50">NODE_ILORIN_SECURE</div>
             </header>
 
-            <section id="content-container" class="flex-1 overflow-y-auto p-10 no-scrollbar space-y-8">
-                
-                <div id="page-dashboard" class="page-content space-y-8 animate-in fade-in duration-500">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="glass p-6 rounded-3xl relative overflow-hidden">
-                            <p class="text-xs font-bold text-slate-500 uppercase">Total Userbase</p>
-                            <h3 class="text-3xl font-black mt-2 mono text-white" id="stat-total-users">--</h3>
-                            <div class="absolute -right-2 -bottom-2 opacity-5 text-6xl"><i class="fa-solid fa-users"></i></div>
+            <section id="viewport" class="flex-1 overflow-y-auto p-10 space-y-8">
+                <div id="page-dashboard" class="page-content space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="glass p-8 rounded-[2rem]">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase">Live Revenue</p>
+                            <h3 class="text-4xl font-black mt-2 mono text-white" id="stat-revenue">$0.00</h3>
                         </div>
-                        <div class="glass p-6 rounded-3xl border-l-4 border-blue-500">
-                            <p class="text-xs font-bold text-slate-500 uppercase">Active Revenue</p>
-                            <h3 class="text-3xl font-black mt-2 mono text-blue-500">$12.4M</h3>
+                        <div class="glass p-8 rounded-[2rem] border-l-4 border-blue-600">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase">Userbase</p>
+                            <h3 class="text-4xl font-black mt-2 mono text-blue-500" id="stat-users">0</h3>
                         </div>
-                        <div class="glass p-6 rounded-3xl">
-                            <p class="text-xs font-bold text-slate-500 uppercase">System Uptime</p>
-                            <h3 class="text-3xl font-black mt-2 mono text-emerald-500">99.9%</h3>
-                        </div>
-                        <div class="glass p-6 rounded-3xl">
-                            <p class="text-xs font-bold text-slate-500 uppercase">Storage Load</p>
-                            <h3 class="text-3xl font-black mt-2 mono text-white">2.4 PB</h3>
+                        <div class="glass p-8 rounded-[2rem]">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase">Latency</p>
+                            <h3 class="text-4xl font-black mt-2 mono text-emerald-500">22ms</h3>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-2 glass p-8 rounded-[2.5rem]">
-                            <div class="flex justify-between items-center mb-8">
-                                <h4 class="font-bold flex items-center gap-2"><i class="fa-solid fa-chart-line text-blue-500"></i> Platform Growth</h4>
-                                <select class="bg-black/20 border border-white/5 text-[10px] rounded-lg px-3 py-1 outline-none">
-                                    <option>Last 30 Days</option>
-                                    <option>Last 6 Months</option>
-                                </select>
-                            </div>
-                            <div class="h-[300px] w-full">
-                                <canvas id="growthChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="glass p-8 rounded-[2.5rem]">
-                            <h4 class="font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-bolt text-yellow-500"></i> Command Logs</h4>
-                            <div id="recent-activity" class="space-y-6">
-                                <div class="flex items-start gap-4">
-                                    <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-xs"><i class="fa-solid fa-shield-halved"></i></div>
-                                    <div>
-                                        <p class="text-xs font-bold text-white">System Handshake</p>
-                                        <p class="text-[10px] text-slate-500">CEO logged in from Lagos, NG</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="glass p-8 rounded-[2.5rem] h-96">
+                        <canvas id="mainChart"></canvas>
                     </div>
                 </div>
 
-                <div id="page-users" class="page-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-2xl font-black">Staff <span class="text-blue-500">Matrix</span></h3>
-                        <button onclick="openEnrollModal()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-6 py-3 rounded-xl transition-all">ENROLL OPERATOR</button>
-                    </div>
-                    <div class="glass rounded-3xl overflow-hidden">
-                        <table class="w-full text-left">
-                            <thead class="bg-white/5 text-[10px] font-bold text-slate-500 uppercase">
-                                <tr>
-                                    <th class="px-8 py-5">Operator</th>
-                                    <th class="px-8 py-5">Designation</th>
-                                    <th class="px-8 py-5">Platform</th>
-                                    <th class="px-8 py-5 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="staff-table-body" class="text-sm">
-                                </tbody>
-                        </table>
+                <div id="page-staff" class="page-content hidden">
+                    <div id="staff-table" class="glass rounded-3xl p-4">
+                        <h3 class="text-xl font-black p-4">Staff <span class="text-blue-500">Matrix</span></h3>
+                        <div id="staff-list" class="space-y-2"></div>
                     </div>
                 </div>
-
-                <div id="page-cinexa" class="page-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-2xl font-black">Cinexa+ <span class="text-blue-500">Content Studio</span></h3>
-                        <button class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-6 py-3 rounded-xl">ADD NEW SHOW</button>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="media-grid">
-                        <div class="glass rounded-[2rem] overflow-hidden group">
-                            <div class="h-48 bg-slate-800 relative">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                                <span class="absolute top-4 left-4 rank-7 role-badge">Trending</span>
-                            </div>
-                            <div class="p-6">
-                                <h5 class="font-bold text-white">Project Excellence</h5>
-                                <p class="text-xs text-slate-500 mt-1">Institutional Documentary • 4K</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </section>
         </main>
     </div>
 
-    <div id="modal-container" class="fixed inset-0 z-[110] bg-black/90 hidden items-center justify-center p-6 backdrop-blur-sm">
-        <div class="max-w-lg w-full glass p-10 rounded-[2.5rem] relative">
-            <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <div id="modal-content"></div>
-        </div>
-    </div>
-
     <script>
-        // --- 1. CORE CONFIG ---
+        const AWS_LOGIN_URL = "https://eu-west-29f2urffk8.auth.eu-west-2.amazoncognito.com/login?client_id=3uusgekid70adef850src7mr8t&redirect_uri=https://core.hemafrica.com/dashboard.html&response_type=token&scope=email+openid+phone+profile";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyACO46sTJQffwsQJfFN9cqYa_oDKG14AfQ",
             authDomain: "hem-platform.firebaseapp.com",
@@ -248,189 +115,97 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
         let userProfile = null;
 
-        // --- 2. AUTH ENGINE ---
-        document.getElementById('login-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button');
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i>';
-            
-            try {
-                await auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value);
-            } catch (err) {
-                const errEl = document.getElementById('auth-error');
-                errEl.innerText = "ACCESS REJECTED: " + err.message;
-                errEl.classList.remove('hidden');
-                btn.innerText = "AUTHENTICATE";
-            }
-        };
+        // --- THE SILENT HANDSHAKE ---
+        async function runHandshake() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const idToken = params.get('id_token');
 
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                const doc = await db.collection("hem_staff").doc(user.uid).get();
+            if (!idToken) {
+                // NO TOKEN? Redirect to Cognito immediately.
+                document.getElementById('boot-status').innerText = "Redirecting to AWS Identity...";
+                setTimeout(() => window.location.href = AWS_LOGIN_URL, 1000);
+                return;
+            }
+
+            try {
+                updateBoot(30, "Decoding JWT...");
+                const payload = JSON.parse(atob(idToken.split('.')[1]));
+                const cognitoUid = payload.sub;
+
+                updateBoot(60, "Searching Staff Matrix...");
+                const doc = await db.collection("hem_staff").doc(cognitoUid).get();
+
                 if (doc.exists) {
                     userProfile = doc.data();
-                    launchMatrix();
-                } else if (user.email.includes('haneef')) {
-                    // Auto-Elevate CEO
-                    userProfile = { displayName: "Haneef Mohammed", accessLevel: 10, email: user.email };
-                    await db.collection("hem_staff").doc(user.uid).set(userProfile);
-                    launchMatrix();
+                    launchSystem();
+                } else if (payload.email.includes("haneef")) {
+                    updateBoot(80, "Auto-Seeding CEO Rank...");
+                    userProfile = { displayName: "Haneef Mohammed", email: payload.email, accessLevel: 10 };
+                    await db.collection("hem_staff").doc(cognitoUid).set(userProfile);
+                    launchSystem();
                 } else {
-                    auth.signOut();
-                    alert("Unauthorized node detected.");
+                    document.getElementById('boot-status').innerText = "Access Denied: Node Unauthorized";
+                    document.getElementById('boot-status').classList.add('text-red-500');
                 }
-            } else {
-                document.getElementById('auth-gate').classList.remove('hidden');
-                document.getElementById('main-interface').classList.add('hidden');
+            } catch (err) {
+                console.error(err);
+                document.getElementById('boot-status').innerText = "Handshake Error. Retrying...";
+                setTimeout(() => window.location.href = AWS_LOGIN_URL, 2000);
             }
-        });
+        }
 
-        function launchMatrix() {
-            document.getElementById('auth-gate').classList.add('hidden');
-            document.getElementById('main-interface').classList.remove('hidden');
+        function launchSystem() {
+            updateBoot(100, "Authorized.");
+            setTimeout(() => {
+                document.getElementById('boot-screen').style.opacity = "0";
+                document.getElementById('main-os').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('boot-screen').remove();
+                    document.getElementById('main-os').style.opacity = "1";
+                    renderUI();
+                }, 800);
+            }, 500);
+        }
+
+        function updateBoot(val, msg) {
+            document.getElementById('boot-progress').style.width = val + "%";
+            document.getElementById('boot-status').innerText = msg;
+        }
+
+        function renderUI() {
+            document.getElementById('u-name').innerText = userProfile.displayName;
+            document.getElementById('u-rank').innerText = `Rank ${userProfile.accessLevel} // CEO`;
+            document.getElementById('u-avatar').innerText = userProfile.displayName[0];
             
-            // UI Sync
-            document.getElementById('user-name').innerText = userProfile.displayName;
-            document.getElementById('user-rank').innerText = `RANK ${userProfile.accessLevel} // ${getRankLabel(userProfile.accessLevel)}`;
-            document.getElementById('user-avatar').innerText = userProfile.displayName[0].toUpperCase();
-            
-            checkPermissions();
-            initCharts();
-            loadStaff();
-            syncLiveStats();
+            // Sync Live Stats
+            db.collection("users").onSnapshot(s => document.getElementById('stat-users').innerText = s.size);
+            initChart();
         }
 
-        function getRankLabel(level) {
-            const labels = { 10: "CEO", 9: "BOARD", 8: "SUPER ADMIN", 7: "ADMIN", 6: "OPS MGR", 5: "CONTENT", 4: "MODERATOR", 3: "SUPPORT", 2: "ANALYST", 1: "INTERN" };
-            return labels[level] || "OPERATOR";
-        }
-
-        // --- 3. SYSTEM LOGIC ---
-        function checkPermissions() {
-            document.querySelectorAll('[data-access]').forEach(el => {
-                const required = parseInt(el.dataset.access);
-                if (userProfile.accessLevel < required) el.remove();
-            });
-        }
-
-        function showPage(pageId) {
+        function switchPage(page) {
             document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
-            document.getElementById('view-title').innerText = pageId.charAt(0).toUpperCase() + pageId.slice(1) + " Overview";
-            
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('sidebar-active'));
+            document.getElementById(`page-${page}`).classList.remove('hidden');
+            document.getElementById('view-title').innerText = page.toUpperCase();
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('sidebar-active'));
             event.currentTarget.classList.add('sidebar-active');
         }
 
-        function syncLiveStats() {
-            db.collection("users").onSnapshot(snap => {
-                document.getElementById('stat-total-users').innerText = snap.size.toLocaleString();
-            });
-        }
-
-        function loadStaff() {
-            db.collection("hem_staff").onSnapshot(snap => {
-                const container = document.getElementById('staff-table-body');
-                container.innerHTML = '';
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    container.innerHTML += `
-                        <tr class="border-t border-white/5 hover:bg-white/5 transition-all group">
-                            <td class="px-8 py-5">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-lg bg-blue-600/10 text-blue-500 flex items-center justify-center font-bold text-xs">${data.displayName[0]}</div>
-                                    <div>
-                                        <p class="font-bold text-white">${data.displayName}</p>
-                                        <p class="text-[10px] text-slate-500">${data.email}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-8 py-5">
-                                <span class="role-badge ${data.accessLevel >= 7 ? 'rank-10' : 'rank-1'}">
-                                    Rank ${data.accessLevel} // ${getRankLabel(data.accessLevel)}
-                                </span>
-                            </td>
-                            <td class="px-8 py-5 mono text-[10px] text-slate-500">HEM CLOUD // NODE 1</td>
-                            <td class="px-8 py-5 text-right">
-                                <button onclick="editStaff('${doc.id}')" class="text-slate-500 hover:text-blue-500 transition-colors"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            });
-        }
-
-        function initCharts() {
-            const ctx = document.getElementById('growthChart').getContext('2d');
+        function initChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Active Users',
-                        data: [12000, 19000, 30000, 45000, 70000, 105000],
-                        borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.05)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 3,
-                        pointRadius: 0
-                    }]
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    datasets: [{ data: [20, 50, 40, 90, 80, 60], borderColor: '#3B82F6', tension: 0.4, fill: true, backgroundColor: 'rgba(59,130,246,0.05)', pointRadius: 0 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#64748b', font: { size: 10 } } },
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
             });
         }
 
-        // --- 4. UI COMPONENTS ---
-        function openEnrollModal() {
-            if (userProfile.accessLevel < 8) return alert("System Authority Level 8 required.");
-            const modal = document.getElementById('modal-container');
-            const content = document.getElementById('modal-content');
-            content.innerHTML = `
-                <h3 class="text-2xl font-black mb-2 text-white">Enroll New Operator</h3>
-                <p class="text-xs text-slate-500 mb-8">This will grant institutional access to the H.E.M CORE infrastructure.</p>
-                <div class="space-y-6">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2 ml-1">Full Name</label>
-                        <input type="text" id="new-name" class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm" placeholder="John Doe">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2 ml-1">Assigned Rank (1-10)</label>
-                            <input type="number" id="new-rank" class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm" value="1">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2 ml-1">Work Email</label>
-                            <input type="email" id="new-email" class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm" placeholder="operator@hemafrica.com">
-                        </div>
-                    </div>
-                    <button onclick="commitEnrollment()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all">GENERATE CREDENTIALS</button>
-                </div>
-            `;
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('modal-container');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function signOut() {
-            auth.signOut();
-        }
+        window.onload = runHandshake;
     </script>
 </body>
 </html>
