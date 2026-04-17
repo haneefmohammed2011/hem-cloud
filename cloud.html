@@ -2,35 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>H.E.M. | Cloud Status</title>
+    <title>H.E.M. CORE | Cloud Storage Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #050b14; color: white; font-family: monospace; padding: 50px; }
-        .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .stat-card { border: 1px solid #1e293b; padding: 30px; background: #0a101f; }
-        .val { font-size: 2rem; color: #00ff88; font-weight: bold; margin-top: 10px; }
-        .label { color: #64748b; font-size: 12px; text-transform: uppercase; }
+        :root { --accent: #0066ff; --bg: #000; --panel: #0a0a0a; --border: rgba(255,255,255,0.08); }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 50px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+        .card { background: var(--panel); border: 1px solid var(--border); padding: 25px; border-radius: 20px; }
+        .val { font-size: 28px; font-weight: 900; font-family: 'Space Mono'; color: var(--accent); }
+        .btn-back { color: #64748b; text-decoration: none; font-size: 12px; margin-bottom: 20px; display: inline-block; }
     </style>
 </head>
 <body>
-    <h2 style="margin-bottom: 40px;">GLOBAL_INFRASTRUCTURE_REPORT</h2>
-    <div class="status-grid">
-        <div class="stat-card">
-            <div class="label">AWS Region</div>
-            <div class="val">eu-west-2</div>
-            <p style="font-size: 10px; margin-top: 5px;">London, UK Node</p>
-        </div>
-        <div class="stat-card">
-            <div class="label">SSO Node Status</div>
-            <div class="val" style="color: #003399;">ACTIVE</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">System Uptime</div>
-            <div class="val">99.98%</div>
-        </div>
+    <a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> RETURN TO CORE</a>
+    <h1 style="font-size: 36px; font-weight: 900; margin-bottom: 10px;">Cloud <span style="color:var(--accent)">Storage</span> Admin</h1>
+    <p style="color: #64748b; margin-bottom: 40px;">Monitoring global data throughput and user storage quotas.</p>
+
+    <div class="grid">
+        <div class="card"><p style="font-size: 11px; color: #64748b;">TOTAL STORAGE USED</p><div class="val">1.2 TB</div></div>
+        <div class="card"><p style="font-size: 11px; color: #64748b;">ACTIVE UPLOADS</p><div class="val">42</div></div>
+        <div class="card"><p style="font-size: 11px; color: #64748b;">BANDWIDTH (24H)</p><div class="val">856 GB</div></div>
     </div>
-    <div style="margin-top: 40px; border: 1px solid #1e293b; padding: 20px;">
-        <div class="label">Instance ID</div>
-        <div>i-003dc55bdcf82a36d (HEM-Main-Server)</div>
+
+    <div class="card">
+        <h3 style="font-size: 14px; margin-bottom: 20px;">TOP STORAGE USERS</h3>
+        <p style="color: #444; font-family: 'Space Mono'; font-size: 12px;">> Fetching AWS S3 Buckets...<br>> Analysis Complete. No anomalies detected.</p>
     </div>
 </body>
 </html>
