@@ -2,74 +2,198 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>H.E.M. CORE | Live Intelligence</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H.E.M. CORE | Intelligence OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
-        :root { --accent: #0066ff; --neon: #00ff88; --bg: #000; --panel: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.1); }
-        body { background: var(--bg); color: white; margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Layout */
-        aside { width: 280px; border-right: 1px solid var(--border); padding: 25px; display: flex; flex-direction: column; }
-        main { flex: 1; padding: 40px; overflow-y: auto; background: radial-gradient(circle at top right, #0a1128, #000); }
-        
-        /* Dashboard Components */
-        .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-        .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); }
-        .stat-box { margin-bottom: 20px; }
-        .stat-label { font-size: 10px; color: #444; font-weight: 900; text-transform: uppercase; }
-        .stat-value { font-size: 28px; font-weight: 900; font-family: 'Space Mono'; color: var(--neon); }
-        
-        /* Meeting List */
-        .meeting-item { display: flex; align-items: center; gap: 15px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-        .meeting-date { font-family: 'Space Mono'; font-size: 12px; color: var(--accent); }
+        body { font-family: 'Inter', sans-serif; background-color: #050a10; }
+        .glass { background: rgba(16, 42, 67, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .sidebar-active { background: linear-gradient(90deg, #3B82F6 0%, transparent 100%); border-left: 4px solid #3B82F6; }
+        .mono { font-family: 'Space Mono', monospace; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); background-size: 200% 100%; animation: shimmer 2s infinite; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        [data-role-required] { display: none; } /* Hidden by default until JS clears */
     </style>
 </head>
-<body>
+<body class="text-slate-200 overflow-hidden">
 
-    <aside>
-        <h2 style="font-weight:900; margin-bottom:40px;">HEM <span style="color:var(--accent)">CORE</span></h2>
-        <div style="margin-top: auto; padding: 15px; background: var(--panel); border-radius: 12px;">
-            <p id="user-name" style="font-weight: 800; font-size: 14px;">Syncing...</p>
-            <p id="user-rank" style="font-size: 10px; color: var(--neon); font-family: 'Space Mono';">RANK --</p>
+    <div id="auth-gate" class="fixed inset-0 z-[100] bg-[#050a10] flex items-center justify-center p-4">
+        <div class="max-w-md w-full glass p-8 rounded-2xl shadow-2xl">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-extrabold tracking-tighter text-white">HEM <span class="text-blue-500">CORE</span></h2>
+                <p class="text-slate-400 text-sm mt-2">Institutional Access Required</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Work Email</label>
+                    <input type="email" id="login-email" required class="w-full bg-[#0a1118] border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Access Cipher</label>
+                    <input type="password" id="login-password" required class="w-full bg-[#0a1118] border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all transform active:scale-95">AUTHENTICATE</button>
+            </form>
+            <p id="login-error" class="text-red-500 text-xs mt-4 text-center hidden"></p>
         </div>
-    </aside>
+    </div>
 
-    <main>
-        <div class="grid">
-            <div class="left-col">
-                <div class="card" style="margin-bottom:20px;">
-                    <div class="stat-box">
-                        <p class="stat-label">Total Live Revenue (MTD)</p>
-                        <div class="stat-value" id="live-revenue">$0.00</div>
-                    </div>
-                    <div style="height: 300px;">
-                        <canvas id="liveChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <p class="stat-label" style="margin-bottom:15px;">Global Announcements</p>
-                    <div id="announcement-stream">No active broadcasts.</div>
-                </div>
+    <div id="admin-panel" class="flex h-screen w-full hidden">
+        
+        <aside class="w-64 bg-[#08121d] border-r border-white/5 flex flex-col">
+            <div class="p-6">
+                <h1 class="text-xl font-black tracking-tighter italic">H.E.M <span class="text-blue-500">CORE</span></h1>
+                <p class="text-[10px] text-slate-500 mono mt-1 uppercase tracking-widest">Global Ops Panel</p>
             </div>
 
-            <div class="right-col">
-                <div class="card" style="height: 100%;">
-                    <p class="stat-label" style="margin-bottom:20px;">Institutional Calendar</p>
-                    <div id="meeting-list">
-                        <p style="color:#444; font-size:12px;">Scanning for scheduled nodes...</p>
+            <nav class="flex-1 px-4 space-y-1 no-scrollbar overflow-y-auto">
+                <div class="text-[10px] font-bold text-slate-600 uppercase mb-2 px-2">Main</div>
+                <button onclick="switchPage('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl sidebar-active text-white transition-all">
+                    <i class="fa-solid fa-layer-group text-blue-500"></i> <span class="text-sm font-semibold">Overview</span>
+                </button>
+                
+                <div data-role-required="7" class="mt-6">
+                    <div class="text-[10px] font-bold text-slate-600 uppercase mb-2 px-2">Management</div>
+                    <button onclick="switchPage('directory')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all">
+                        <i class="fa-solid fa-users"></i> <span class="text-sm font-semibold">User Directory</span>
+                    </button>
+                    <button onclick="switchPage('content')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all">
+                        <i class="fa-solid fa-clapperboard"></i> <span class="text-sm font-semibold">Cinexa+ CMS</span>
+                    </button>
+                </div>
+
+                <div data-role-required="9" class="mt-6">
+                    <div class="text-[10px] font-bold text-slate-600 uppercase mb-2 px-2">Governance</div>
+                    <button onclick="switchPage('analytics')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all">
+                        <i class="fa-solid fa-chart-line"></i> <span class="text-sm font-semibold">Financials</span>
+                    </button>
+                    <button data-role-required="10" onclick="switchPage('root')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition-all">
+                        <i class="fa-solid fa-microchip"></i> <span class="text-sm font-semibold text-red-400">System Root</span>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="p-4 bg-[#0a1824] border-t border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg" id="avatar-initial">H</div>
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-xs font-bold truncate" id="admin-name">Loading...</p>
+                        <p class="text-[9px] mono text-blue-400" id="admin-role-label">RANK --</p>
                     </div>
-                    <button onclick="addMeeting()" style="width:100%; margin-top:20px; background:var(--accent); color:white; border:none; padding:12px; border-radius:8px; font-weight:800; cursor:pointer;">+ SCHEDULE MEETING</button>
+                    <button onclick="logout()" class="text-slate-500 hover:text-red-500"><i class="fa-solid fa-right-from-bracket"></i></button>
                 </div>
             </div>
-        </div>
-    </main>
+        </aside>
+
+        <main class="flex-1 flex flex-col relative overflow-hidden">
+            <header class="h-16 glass flex items-center justify-between px-8 z-10">
+                <div class="flex items-center gap-4">
+                    <i class="fa-solid fa-search text-slate-500"></i>
+                    <input type="text" placeholder="Search Core Intelligence..." class="bg-transparent border-none text-sm outline-none w-64">
+                </div>
+                <div class="flex items-center gap-6 text-slate-400">
+                    <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500"></div> <span class="text-[10px] mono uppercase">Pinglo Node: Active</span></div>
+                    <i class="fa-solid fa-bell cursor-pointer hover:text-white"></i>
+                </div>
+            </header>
+
+            <section id="content-area" class="flex-1 overflow-y-auto p-8 no-scrollbar">
+                
+                <div id="page-dashboard" class="page-content space-y-8 animate-in fade-in">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <h2 class="text-3xl font-black text-white">Executive <span class="text-blue-500">Overview</span></h2>
+                            <p class="text-slate-400">Welcome back, CEO. Systems are at 99.9% uptime.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="bg-blue-600/10 text-blue-500 px-4 py-2 rounded-lg text-xs font-bold border border-blue-600/20">DOWNLOAD REPORT</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="glass p-6 rounded-2xl relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl"><i class="fa-solid fa-users"></i></div>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Operators</p>
+                            <h3 class="text-2xl font-black mt-2 mono" id="stat-users">0</h3>
+                            <p class="text-[10px] text-green-500 mt-1 font-bold">+12% from last month</p>
+                        </div>
+                        <div class="glass p-6 rounded-2xl">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Revenue</p>
+                            <h3 class="text-2xl font-black mt-2 mono text-blue-500">$124,500</h3>
+                            <div class="w-full bg-white/5 h-1 mt-4 rounded-full overflow-hidden"><div class="bg-blue-500 h-full w-[70%]"></div></div>
+                        </div>
+                        <div class="glass p-6 rounded-2xl">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Cinexa+ Streaming</p>
+                            <h3 class="text-2xl font-black mt-2 mono">1.2 PB</h3>
+                            <p class="text-[10px] text-slate-500 mt-1">Storage Node: Frankfurt</p>
+                        </div>
+                        <div class="glass p-6 rounded-2xl">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">System Health</p>
+                            <h3 class="text-2xl font-black mt-2 mono text-green-500">99.99%</h3>
+                            <p class="text-[10px] text-slate-500 mt-1">Latency: 24ms</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 glass p-6 rounded-2xl min-h-[400px]">
+                            <h4 class="text-sm font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-chart-area text-blue-500"></i> Network Growth</h4>
+                            <canvas id="growthChart"></canvas>
+                        </div>
+                        <div class="glass p-6 rounded-2xl">
+                            <h4 class="text-sm font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-history text-blue-500"></i> Terminal Logs</h4>
+                            <div class="space-y-4" id="recent-logs">
+                                <div class="flex items-start gap-3 border-l-2 border-blue-500 pl-4 py-1">
+                                    <div>
+                                        <p class="text-xs font-bold">New Admin Registered</p>
+                                        <p class="text-[10px] text-slate-500">2 minutes ago • System</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-directory" class="page-content hidden space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-black">User <span class="text-blue-500">Intelligence</span></h2>
+                        <button data-role-required="8" class="bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-bold">ENROLL NEW OPERATOR</button>
+                    </div>
+
+                    <div class="glass rounded-2xl overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-white/5 text-[10px] uppercase font-bold text-slate-500 tracking-widest">
+                                <tr>
+                                    <th class="px-6 py-4">Operator</th>
+                                    <th class="px-6 py-4">Rank / Role</th>
+                                    <th class="px-6 py-4">Platform Node</th>
+                                    <th class="px-6 py-4">Last Activity</th>
+                                    <th class="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-table-body" class="text-sm">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <div id="modal-container" class="fixed inset-0 z-[110] bg-black/80 flex items-center justify-center hidden p-4">
+        <div class="max-w-xl w-full glass p-8 rounded-2xl" id="modal-content"></div>
+    </div>
 
     <script>
+        // --- 1. CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyACO46sTJQffwsQJfFN9cqYa_oDKG14AfQ",
             authDomain: "hem-platform.firebaseapp.com",
@@ -81,74 +205,182 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        // --- 1. LIVE CHART ENGINE ---
-        const ctx = document.getElementById('liveChart').getContext('2d');
-        const liveChart = new Chart(ctx, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: 'Revenue', data: [], borderColor: '#0066ff', tension: 0.4, fill: true, backgroundColor: 'rgba(0,102,255,0.05)' }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#444' } } } }
-        });
+        let userData = null;
+        let growthChart = null;
 
-        // --- 2. AUTO-DETECTING REVENUE & CHARTS ---
-        db.collection("revenue").orderBy("timestamp", "asc").onSnapshot(snap => {
-            let total = 0;
-            const labels = [];
-            const values = [];
-            
-            snap.forEach(doc => {
-                const data = doc.data();
-                total += data.amount;
-                labels.push(data.label);
-                values.push(data.amount);
-            });
+        // --- 2. AUTH ENGINE ---
+        document.getElementById('login-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            const err = document.getElementById('login-error');
 
-            document.getElementById('live-revenue').innerText = `$${total.toLocaleString()}`;
-            liveChart.data.labels = labels;
-            liveChart.data.datasets[0].data = values;
-            liveChart.update();
-        });
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                err.classList.add('hidden');
+            } catch (e) {
+                err.innerText = "ACCESS DENIED: Credentials rejected by CORE.";
+                err.classList.remove('hidden');
+            }
+        };
 
-        // --- 3. AUTO-DETECTING CALENDAR ---
-        db.collection("meetings").orderBy("date", "asc").onSnapshot(snap => {
-            const list = document.getElementById('meeting-list');
-            list.innerHTML = '';
-            snap.forEach(doc => {
-                const m = doc.data();
-                list.innerHTML += `
-                    <div class="meeting-item">
-                        <div class="meeting-date">${m.date}</div>
-                        <div>
-                            <p style="font-size:13px; font-weight:700;">${m.title}</p>
-                            <p style="font-size:10px; color:#444;">${m.time} • ${m.platform}</p>
-                        </div>
-                    </div>
-                `;
-            });
-        });
-
-        // --- 4. USER AUTH & RANK ---
-        firebase.auth().onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
-                db.collection("users").doc(user.uid).onSnapshot(doc => {
-                    const data = doc.data();
-                    document.getElementById('user-name').innerText = data.displayName || "H.E.M. Operator";
-                    document.getElementById('user-rank').innerText = `RANK ${data.accessLevel || 1} // CEO`;
-                });
+                const doc = await db.collection("users").doc(user.uid).get();
+                if (!doc.exists) {
+                    // One-time initialization for new admins
+                    userData = { 
+                        displayName: user.email.split('@')[0], 
+                        email: user.email, 
+                        accessLevel: 10, // Defaulting to CEO for your account setup
+                        lastLogin: new Date().toISOString()
+                    };
+                    await db.collection("users").doc(user.uid).set(userData);
+                } else {
+                    userData = doc.data();
+                }
+                initDashboard();
+            } else {
+                document.getElementById('auth-gate').classList.remove('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
             }
         });
 
-        // FUNCTION: Push real data to test the system
-        function addMeeting() {
-            const title = prompt("Meeting Title:");
-            if(title) {
-                db.collection("meetings").add({
-                    title: title,
-                    date: "APR 20",
-                    time: "14:00 GMT",
-                    platform: "HEM Connect"
+        function logout() {
+            auth.signOut();
+        }
+
+        // --- 3. CORE LOGIC ---
+        function initDashboard() {
+            document.getElementById('auth-gate').classList.add('hidden');
+            document.getElementById('admin-panel').classList.remove('hidden');
+            
+            // Set UI details
+            document.getElementById('admin-name').innerText = userData.displayName;
+            document.getElementById('admin-role-label').innerText = `RANK ${userData.accessLevel} // ${getRankName(userData.accessLevel)}`;
+            document.getElementById('avatar-initial').innerText = userData.displayName[0].toUpperCase();
+
+            checkPermissions();
+            initCharts();
+            loadUsers();
+            
+            // Dashboard auto-detecting real counts
+            db.collection("users").onSnapshot(snap => {
+                document.getElementById('stat-users').innerText = snap.size;
+            });
+        }
+
+        function getRankName(level) {
+            const ranks = { 10: "CEO", 9: "BOARD", 8: "SUPER ADMIN", 7: "ADMIN", 6: "OPS MGR", 5: "CONTENT", 4: "MOD", 3: "SUPPORT", 2: "ANALYST", 1: "INTERN" };
+            return ranks[level] || "OPERATOR";
+        }
+
+        function checkPermissions() {
+            document.querySelectorAll('[data-role-required]').forEach(el => {
+                const minRole = parseInt(el.getAttribute('data-role-required'));
+                if (userData.accessLevel >= minRole) el.style.display = 'block';
+                else el.remove();
+            });
+        }
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('sidebar-active', 'text-white'));
+            event.currentTarget.classList.add('sidebar-active', 'text-white');
+        }
+
+        function loadUsers() {
+            db.collection("users").limit(10).onSnapshot(snap => {
+                const container = document.getElementById('user-table-body');
+                container.innerHTML = '';
+                snap.forEach(doc => {
+                    const u = doc.data();
+                    container.innerHTML += `
+                        <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
+                            <td class="px-6 py-4 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded bg-blue-600/20 text-blue-500 flex items-center justify-center text-[10px] font-bold">${u.displayName[0]}</div>
+                                <div>
+                                    <p class="font-bold">${u.displayName}</p>
+                                    <p class="text-[10px] text-slate-500">${u.email}</p>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-blue-500/10 text-blue-500 rounded text-[10px] font-bold uppercase tracking-widest">Rank ${u.accessLevel}</span></td>
+                            <td class="px-6 py-4 font-mono text-xs text-slate-500">${u.platform || 'HEM Cloud'}</td>
+                            <td class="px-6 py-4 text-xs text-slate-400">${u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Inactive'}</td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="openEditModal('${doc.id}')" class="text-slate-500 hover:text-white"><i class="fa-solid fa-ellipsis-v"></i></button>
+                            </td>
+                        </tr>
+                    `;
                 });
-            }
+            });
+        }
+
+        function initCharts() {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            if (growthChart) growthChart.destroy();
+            
+            growthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Core Utilization',
+                        data: [65, 59, 80, 81, 56, 95],
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function openEditModal(uid) {
+            if(userData.accessLevel < 8) return alert("CORE: Authority level 8 required for manual override.");
+            const container = document.getElementById('modal-container');
+            const content = document.getElementById('modal-content');
+            
+            content.innerHTML = `
+                <h3 class="text-xl font-bold mb-4">Edit Operator Authority</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-2">New Rank (1-10)</label>
+                        <input type="number" id="new-rank" class="w-full bg-black/40 border border-slate-700 rounded p-2" placeholder="Enter level">
+                    </div>
+                    <div class="flex gap-2 justify-end mt-6">
+                        <button onclick="closeModal()" class="px-4 py-2 text-xs font-bold text-slate-500 uppercase">Cancel</button>
+                        <button onclick="updateRank('${uid}')" class="bg-blue-600 px-6 py-2 rounded-lg text-xs font-bold">COMMIT CHANGE</button>
+                    </div>
+                </div>
+            `;
+            container.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-container').classList.add('hidden');
+        }
+
+        async function updateRank(uid) {
+            const level = document.getElementById('new-rank').value;
+            if(!level) return;
+            await db.collection("users").doc(uid).update({ accessLevel: parseInt(level) });
+            closeModal();
         }
     </script>
 </body>
