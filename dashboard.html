@@ -3,243 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.E.M. SENTINEL | Live Operations</title>
+    <title>H.E.M. | DEEP VOID</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root { 
-            --bg: #020617; 
-            --accent: #3b82f6; 
-            --glass: rgba(15, 23, 42, 0.7);
-            --border: rgba(255, 255, 255, 0.08);
+            --void: #000000; 
+            --accent: #2563eb; 
+            --glass: rgba(255, 255, 255, 0.02);
+            --border: rgba(255, 255, 255, 0.05);
         }
 
         body { 
-            background-color: var(--bg); 
-            color: #f8fafc; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background-color: var(--void); 
+            color: #ffffff; 
+            font-family: 'Inter', sans-serif; 
             overflow: hidden; 
         }
-        
-        /* THE ORIGINAL v10.5 TACTICAL GLASS */
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.03); 
-            border: 1px solid var(--border); 
-            border-radius: 2.5rem; /* The Signature Large Radius */
-            backdrop-filter: blur(20px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+        /* DEEP VOID GLASS */
+        .glass-panel { 
+            background: var(--glass);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--border);
+            border-radius: 3rem;
+            transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .glass-card:hover { 
-            border-color: var(--accent); 
-            background: rgba(255, 255, 255, 0.06); 
-            transform: translateY(-4px);
+        .glass-panel:hover {
+            border-color: rgba(37, 99, 235, 0.3);
+            background: rgba(255, 255, 255, 0.04);
         }
 
-        /* INVISIBLE SCROLLBARS */
+        /* CENTERED LAYOUT ENGINE */
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: 100vh;
+            width: 100vw;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        /* INVISIBLE ELEMENTS */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* SIDEBAR LINKS (Tactical Italic Style) */
-        .sidebar-link { 
-            color: #64748b; 
-            transition: 0.3s; 
-            opacity: 0.5;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-style: italic;
+        .nav-link { 
+            opacity: 0.3; 
+            transition: 0.4s; 
+            letter-spacing: 0.2em;
         }
 
-        .sidebar-link:hover { 
+        .nav-link:hover, .nav-link.active { 
             opacity: 1; 
-            color: white;
-            transform: translateX(8px);
+            text-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
         }
 
-        .sidebar-link.active { 
-            opacity: 1; 
-            color: var(--accent); 
-            font-weight: 900; 
-        }
-
-        .hidden { display: none !important; }
+        .chart-container { position: relative; height: 100%; width: 100%; }
     </style>
 </head>
-<body class="flex h-screen w-screen overflow-hidden">
+<body class="no-scrollbar">
 
-    <aside class="w-80 border-r border-white/5 flex flex-col no-scrollbar overflow-y-auto bg-[#020617]">
-        <div class="p-12 mb-4">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white italic">H</div>
-                <h1 class="font-black italic text-xl tracking-tighter uppercase">Sentinel <span class="text-blue-500">Core</span></h1>
+    <div class="app-container">
+        
+        <aside class="glass-panel flex flex-col p-12">
+            <div class="mb-20 text-center">
+                <h1 class="text-3xl font-black italic tracking-tighter">H.E.M.</h1>
+                <p class="text-[9px] font-bold text-blue-500 uppercase tracking-[0.5em] mt-2">Deep Void OS</p>
             </div>
-            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-[0.4em]">Executive Shell v12.0</p>
-        </div>
 
-        <nav class="flex-1 px-12 space-y-12">
-            <div class="space-y-8">
-                <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Command</p>
-                <button onclick="nav('analytics')" class="sidebar-link active w-full flex items-center gap-4 text-xs">
-                    <i class="fa-solid fa-gauge-high"></i> Operations
+            <nav class="flex-1 space-y-12">
+                <button onclick="nav('ops')" class="nav-link active w-full text-left text-[11px] font-black uppercase italic flex items-center gap-4">
+                    <span class="w-1 h-1 bg-blue-500 rounded-full"></span> Operations
                 </button>
-                <button onclick="nav('revenue')" class="sidebar-link w-full flex items-center gap-4 text-xs">
-                    <i class="fa-solid fa-sack-dollar"></i> Monetag Ads
+                <button onclick="nav('monetag')" class="nav-link w-full text-left text-[11px] font-black uppercase italic flex items-center gap-4">
+                    <span class="w-1 h-1 bg-slate-700 rounded-full"></span> Monetag
                 </button>
-                <button onclick="nav('infrastructure')" class="sidebar-link w-full flex items-center gap-4 text-xs">
-                    <i class="fa-solid fa-server"></i> AWS / CloudWatch
+                <button onclick="nav('infra')" class="nav-link w-full text-left text-[11px] font-black uppercase italic flex items-center gap-4">
+                    <span class="w-1 h-1 bg-slate-700 rounded-full"></span> Cloud Infrastructure
                 </button>
-            </div>
-        </nav>
+            </nav>
 
-        <div class="p-12">
-            <div class="glass-card p-6 border-blue-500/20 rounded-[2rem]">
-                <p class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Clearance</p>
-                <p class="text-xs font-black mt-1 truncate uppercase">Level 10 CEO</p>
+            <div class="mt-auto pt-10 border-t border-white/5 text-center">
+                <p class="text-[10px] font-bold text-slate-500 uppercase mb-4">CEO Clearance</p>
+                <button onclick="logout()" class="text-[9px] font-black text-red-500 uppercase tracking-widest hover:opacity-50">Disconnect</button>
             </div>
-        </div>
-    </aside>
+        </aside>
 
-    <main class="flex-1 flex flex-col min-w-0">
-        <header class="h-24 flex items-center justify-between px-16">
-            <div id="breadcrumb" class="text-[11px] mono text-slate-500 uppercase tracking-[0.3em] font-bold italic">System / Analytics</div>
-            <div class="flex items-center gap-4">
-                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Secure Uplink Active</span>
-            </div>
-        </header>
-
-        <div class="flex-1 overflow-y-auto p-16 pt-4 no-scrollbar">
+        <main class="flex flex-col gap-8 no-scrollbar overflow-y-auto">
             
-            <section id="view-analytics" class="tab-view space-y-10">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="glass-card p-10">
-                        <p class="text-[10px] text-slate-500 font-bold uppercase mb-2 tracking-widest">Ad Revenue</p>
-                        <h2 id="ad-revenue" class="text-3xl font-black text-emerald-400">$0.00</h2>
-                        <p class="text-[9px] text-slate-600 uppercase mt-2 font-bold">Monetag Live Feed</p>
-                    </div>
-                    <div class="glass-card p-10">
-                        <p class="text-[10px] text-slate-500 font-bold uppercase mb-2 tracking-widest">RDS CPU Load</p>
-                        <h2 id="rds-cpu" class="text-3xl font-black text-blue-400">0.0%</h2>
-                        <p class="text-[9px] text-slate-600 uppercase mt-2 font-bold">AWS CloudWatch</p>
-                    </div>
-                    <div class="glass-card p-10">
-                        <p class="text-[10px] text-slate-500 font-bold uppercase mb-2 tracking-widest">Active Sessions</p>
-                        <h2 id="user-count" class="text-3xl font-black text-slate-200">--</h2>
-                        <p class="text-[9px] text-slate-600 uppercase mt-2 font-bold">CinexaPlus Cluster</p>
-                    </div>
+            <header class="flex justify-between items-end px-4">
+                <div>
+                    <h2 id="view-title" class="text-4xl font-black italic uppercase tracking-tighter">Global Mainframe</h2>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase mt-2 tracking-widest">Real-time AWS & Monetag Synchronization</p>
                 </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest animate-pulse">● System_Nominal</p>
+                </div>
+            </header>
 
-                <div class="glass-card p-12 h-96">
-                    <canvas id="liveChart"></canvas>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-panel p-10">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-4">Yield (24H)</p>
+                    <h3 id="stat-rev" class="text-4xl font-black text-blue-500">$1,330.34</h3>
                 </div>
-            </section>
-
-            <section id="view-revenue" class="tab-view hidden space-y-8">
-                <h3 class="text-2xl font-black italic uppercase tracking-widest">Network <span class="text-emerald-500">Yield</span></h3>
-                <div class="glass-card overflow-hidden border-white/5">
-                    <table class="w-full text-left">
-                        <thead class="bg-white/5 text-[10px] uppercase text-slate-500 font-black tracking-widest">
-                            <tr>
-                                <th class="p-6">Website</th>
-                                <th class="p-6">Impressions</th>
-                                <th class="p-6">CPM</th>
-                                <th class="p-6">Earnings</th>
-                            </tr>
-                        </thead>
-                        <tbody id="monetag-tbody" class="divide-y divide-white/5 text-sm font-bold">
-                            </tbody>
-                    </table>
+                <div class="glass-panel p-10">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-4">RDS Node Load</p>
+                    <h3 id="stat-cpu" class="text-4xl font-black text-white">4.2%</h3>
                 </div>
-            </section>
+                <div class="glass-panel p-10">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-4">Live Traffic</p>
+                    <h3 id="stat-traffic" class="text-4xl font-black text-white">1,240</h3>
+                </div>
+            </div>
 
-            <section id="view-infrastructure" class="tab-view hidden">
-                <div class="glass-card p-12">
-                    <h3 class="text-xl font-black italic uppercase mb-8">AWS Infrastructure</h3>
-                    <div class="space-y-4 text-xs font-mono text-blue-400">
-                        <p>> [RDS] STATUS: OPTIMAL</p>
-                        <p>> [EC2] NODES: 4 ACTIVE</p>
-                        <p>> [S3] UPLINK: STABLE</p>
+            <div class="glass-panel p-12 flex-1 min-h-[500px]">
+                <div class="flex justify-between items-center mb-10">
+                    <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 italic">Network Throughput Visualization</h4>
+                    <div class="flex gap-4">
+                        <span class="text-[9px] font-bold py-1 px-3 border border-white/10 rounded-full">AWS RDS</span>
+                        <span class="text-[9px] font-bold py-1 px-3 border border-blue-500/50 text-blue-500 rounded-full">TRAFFIC</span>
                     </div>
                 </div>
-            </section>
-        </div>
-    </main>
+                <div class="chart-container">
+                    <canvas id="voidChart"></canvas>
+                </div>
+            </div>
+
+        </main>
+    </div>
 
     <script>
-        // --- 1. NAVIGATION ---
+        // --- DATA HUB ---
         function nav(id) {
-            document.querySelectorAll('.tab-view').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            const titles = { 'ops': 'Global Mainframe', 'monetag': 'Ad Performance', 'infra': 'AWS Cluster' };
+            document.getElementById('view-title').innerText = titles[id];
             
-            document.getElementById(`view-${id}`).classList.remove('hidden');
-            // Support for trigger from event
-            if(event) event.currentTarget.classList.add('active');
-            
-            document.getElementById('breadcrumb').innerText = `System / ${id.toUpperCase()}`;
+            // Animation reset
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            event.currentTarget.classList.add('active');
         }
 
-        // --- 2. DATA ENGINE ---
-        async function fetchMonetagData() {
-            const mockData = [
-                { site: 'CINEXAPLUS.COM', imp: '420,500', cpm: '$1.20', earn: '$504.60' },
-                { site: 'HEMAFRICA.COM', imp: '12,300', cpm: '$0.85', earn: '$10.45' }
-            ];
-            
-            const tbody = document.getElementById('monetag-tbody');
-            tbody.innerHTML = mockData.map(row => `
-                <tr class="hover:bg-white/5 transition-colors">
-                    <td class="p-6 font-black italic text-blue-400">${row.site}</td>
-                    <td class="p-6 text-slate-400">${row.imp}</td>
-                    <td class="p-6 text-emerald-500">${row.cpm}</td>
-                    <td class="p-6 text-white font-black">${row.earn}</td>
-                </tr>
-            `).join('');
+        // --- GRAPH ENGINE ---
+        const ctx = document.getElementById('voidChart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(37, 99, 235, 0.2)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-            document.getElementById('ad-revenue').innerText = '$515.05';
-        }
-
-        function updateAWSMetrics() {
-            const cpu = (Math.random() * (9.2 - 4.1) + 4.1).toFixed(1);
-            const rdsEl = document.getElementById('rds-cpu');
-            if(rdsEl) rdsEl.innerText = `${cpu}%`;
-            
-            const users = Math.floor(Math.random() * (1400 - 900) + 900);
-            const userEl = document.getElementById('user-count');
-            if(userEl) userEl.innerText = users.toLocaleString();
-        }
-
-        // --- 3. CHART ---
-        const ctx = document.getElementById('liveChart').getContext('2d');
-        const liveChart = new Chart(ctx, {
+        const voidChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                labels: Array(24).fill(''),
                 datasets: [{
-                    data: [20, 45, 80, 60, 95, 110],
-                    borderColor: '#3b82f6',
-                    borderWidth: 3,
-                    tension: 0.45,
+                    label: 'Throughput',
+                    data: [30, 45, 32, 70, 85, 60, 90, 120, 110, 150, 140, 180, 170, 210, 200, 250, 230, 280, 260, 310, 290, 340, 320, 400],
+                    borderColor: '#2563eb',
+                    borderWidth: 4,
+                    pointRadius: 0,
+                    tension: 0.4,
                     fill: true,
-                    backgroundColor: 'rgba(59, 130, 246, 0.03)',
-                    pointRadius: 0
+                    backgroundColor: gradient
                 }]
             },
             options: {
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: { 
-                    x: { display: true, grid: { display: false }, ticks: { color: '#475569', font: { weight: 'bold' } } }, 
-                    y: { grid: { color: 'rgba(255,255,255,0.02)' }, ticks: { color: '#475569' } } 
+                scales: {
+                    x: { display: false },
+                    y: { 
+                        grid: { color: 'rgba(255,255,255,0.02)', drawBorder: false },
+                        ticks: { color: '#475569', font: { weight: 'bold', size: 10 } }
+                    }
                 }
             }
         });
 
-        // Initialize
-        setInterval(updateAWSMetrics, 3000);
-        fetchMonetagData();
+        // --- LIVE UPDATES ---
+        setInterval(() => {
+            const cpu = (Math.random() * (6 - 3) + 3).toFixed(1);
+            document.getElementById('stat-cpu').innerText = `${cpu}%`;
+            
+            // Update chart data point
+            voidChart.data.datasets[0].data.shift();
+            voidChart.data.datasets[0].data.push(Math.floor(Math.random() * (400 - 300) + 300));
+            voidChart.update('none');
+        }, 3000);
+
+        function logout() {
+            window.location.href = "https://eu-west-29f2urffk8.auth.eu-west-2.amazoncognito.com/logout?client_id=3uusgekid70adef850src7mr8t&logout_uri=https://core.hemafrica.com/dashboard.html";
+        }
     </script>
 </body>
 </html>
