@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body { background: #000; color: white; font-family: sans-serif; padding: 40px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 800px; }
+        input, select { background: #111; border: 1px solid #222; padding: 12px; color: white; border-radius: 8px; width: 100%; }
+        label { font-size: 11px; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .btn-save { grid-column: span 2; background: #0066ff; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: 900; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Add New <span style="color:#0066ff">Personnel</span></h1>
+    <form id="onboardForm" class="form-grid">
+        <div><label>Full Name</label><input type="text" id="name" required></div>
+        <div><label>Date of Birth</label><input type="date" id="dob"></div>
+        <div><label>Personal Email</label><input type="email" id="pEmail"></div>
+        <div><label>HEM Work Email</label><input type="email" id="wEmail"></div>
+        <div><label>Phone Number</label><input type="tel" id="phone"></div>
+        <div><label>Emergency Contact</label><input type="text" id="emergency"></div>
+        <div><label>Bank Name</label><input type="text" id="bankName"></div>
+        <div><label>Account Number</label><input type="text" id="accountNum"></div>
+        <div><label>Access Level</label>
+            <select id="level">
+                <option value="1">1 - Intern</option>
+                <option value="5">5 - Staff</option>
+                <option value="10">10 - CEO</option>
+            </select>
+        </div>
+        <button type="submit" class="btn-save">ENROLL PERSONNEL</button>
+    </form>
+
+    <script>
+        document.getElementById('onboardForm').onsubmit = (e) => {
+            e.preventDefault();
+            // Firebase Logic would go here
+            parent.hemNotify("Personnel enrolled successfully. System updated.");
+        };
+    </script>
+</body>
+</html>

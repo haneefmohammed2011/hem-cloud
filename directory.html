@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body { background: #000; color: white; font-family: sans-serif; padding: 40px; }
+        .search-container { margin-bottom: 30px; }
+        .search-input { width: 100%; padding: 15px; background: #0a0a0a; border: 1px solid #1a1a1a; color: white; border-radius: 12px; font-size: 16px; }
+        table { width: 100%; border-collapse: collapse; }
+        td, th { padding: 15px; border-bottom: 1px solid #111; text-align: left; }
+        .btn-edit { background: #222; color: #0066ff; border: 1px solid #0066ff; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search by name, email, or rank..." onkeyup="filterUsers()">
+    </div>
+
+    <table>
+        <thead><tr><th>Employee</th><th>Rank</th><th>HEM Email</th><th>Action</th></tr></thead>
+        <tbody id="userTable">
+            <tr>
+                <td>Haneef Mohammed</td>
+                <td><span style="color:#00ff88">10</span></td>
+                <td>haneef@hemafrica.com</td>
+                <td><button class="btn-edit" onclick="parent.loadPage('onboarding.html', this)">EDIT</button></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
