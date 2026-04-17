@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HEM Africa | Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.1); }
+        body { font-family: sans-serif; background: #050505; color: #fff; overflow: hidden; }
+        .glass-panel { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 10px currentColor; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+    <aside class="w-72 border-r border-white/10 p-8 flex flex-col">
+        <h1 class="text-xl font-bold tracking-tighter mb-10">HEM AFRICA</h1>
+        <nav class="space-y-4 flex-1 text-gray-500 text-sm">
+            <div class="text-white font-bold">Dashboard</div>
+            <div>Personnel Registry</div>
+            <div>Infrastructure</div>
+        </nav>
+        <div id="auth-status" class="glass-panel p-4 text-[10px] uppercase">Checking SSO...</div>
+    </aside>
+
+    <main class="flex-1 p-10 overflow-y-auto">
+        <div class="flex justify-between items-end mb-12">
+            <h2 class="text-4xl font-bold">Command Center</h2>
+            <div class="text-right">
+                <p class="text-[10px] text-gray-500 uppercase">Live NGN/USD</p>
+                <p id="marketRate" class="text-3xl font-bold font-mono">₦0,000.00</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="glass-panel p-8 lg:col-span-2">
+                <h3 class="text-sm font-bold text-gray-500 mb-8 uppercase italic">Infrastructure Fleet</h3>
+                <div id="fleetContainer" class="space-y-4">
+                    <p class="text-xs animate-pulse">Establishing Connection...</p>
+                </div>
+            </div>
+
+            <div class="glass-panel p-8">
+                <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase italic">Registry</h3>
+                <div class="text-6xl font-light">12</div>
+                <p class="text-xs text-blue-400 mt-2 uppercase">Active Staff</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function refresh() {
+            try {
+                const mRes = await fetch('/api/market');
+                const mData = await mRes.json();
+                document.getElementById('marketRate').innerText = `₦${mData.rate}`;
+
+                const aRes = await fetch('/api/auth/status');
+                const aData = await aRes.json();
+                document.getElementById('auth-status').innerText = aData.loggedIn ? `SSO: ${aData.user}` : "SSO DISCONNECTED";
+
+                const fRes = await fetch('/api/fleet');
+                const fleet = await fRes.json();
+                document.getElementById('fleetContainer').innerHTML = fleet.map(i => `
+                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
+                        <div><p class="font-bold text-sm">${i.name}</p><p class="text-[9px] text-gray-500">${i.id}</p></div>
+                        <div class="flex items-center gap-4"><span class="text-[10px] text-blue-400 font-mono">${i.cpu}</span>
+                        <span class="status-dot ${i.status === 'running' ? 'bg-green-500' : 'bg-red-500'}"></span></div>
+                    </div>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+        setInterval(refresh, 10000);
+        refresh();
+    </script>
+</body>
