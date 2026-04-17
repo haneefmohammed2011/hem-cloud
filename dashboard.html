@@ -3,135 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.E.M. CORE | Global Admin Console</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>H.E.M. CORE | OS-v2</title>
     
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
-        :root { --hem-navy: #050a10; --hem-blue: #3B82F6; --hem-glass: rgba(16, 42, 67, 0.4); }
-        body { font-family: 'Inter', sans-serif; background-color: var(--hem-navy); color: #e2e8f0; }
-        .glass { background: var(--hem-glass); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .sidebar-active { background: linear-gradient(90deg, var(--hem-blue) 0%, transparent 100%); border-left: 4px solid var(--hem-blue); color: white !important; }
-        .mono { font-family: 'Space Mono', monospace; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .role-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase; border: 1px solid currentColor; }
-        .rank-10 { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        :root {
+            --bg-deep: #020617;
+            --accent-blue: #3b82f6;
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-deep); color: #f8fafc; }
+        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); }
+        .sidebar-item:hover, .sidebar-active { background: rgba(59, 130, 246, 0.1); border-right: 3px solid var(--accent-blue); color: white; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom Calendar Styling */
+        .fc { --fc-border-color: rgba(255,255,255,0.05); }
+        .fc-toolbar-title { font-size: 1rem !important; font-weight: 800; }
+        .fc-daygrid-day:hover { background: rgba(255,255,255,0.02); cursor: pointer; }
     </style>
 </head>
-<body class="overflow-hidden">
+<body class="h-screen flex overflow-hidden">
 
-    <div id="main-interface" class="flex h-screen w-full">
-        
-        <aside class="w-72 bg-[#08121d] border-r border-white/5 flex flex-col z-20">
-            <div class="p-8 flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white shadow-lg">H</div>
-                <h1 class="text-xl font-black tracking-tighter italic">HEM <span class="text-blue-500">CORE</span></h1>
+    <aside class="w-64 border-r border-white/5 flex flex-col glass-panel z-50">
+        <div class="p-8 flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <i class="fa-solid fa-layer-group text-white"></i>
             </div>
+            <div>
+                <h1 class="font-extrabold tracking-tighter text-lg leading-none">H.E.M. <span class="text-blue-500">CORE</span></h1>
+                <p class="text-[8px] mono text-slate-500 uppercase tracking-widest mt-1">Admin OS v2.4</p>
+            </div>
+        </div>
 
-            <nav class="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">
-                <p class="text-[10px] font-bold text-slate-600 uppercase mb-4 px-4 tracking-widest">Intelligence</p>
-                <button onclick="showPage('dashboard')" class="nav-link sidebar-active w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all">
-                    <i class="fa-solid fa-house-chimney text-sm"></i> <span class="text-sm font-semibold">Command Center</span>
-                </button>
-                <button onclick="showPage('users')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-white transition-all">
-                    <i class="fa-solid fa-users-gear text-sm"></i> <span class="text-sm font-semibold">Staff Matrix</span>
-                </button>
-                <button onclick="showPage('cinexa')" class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-400 hover:text-white transition-all">
-                    <i class="fa-solid fa-clapperboard text-sm"></i> <span class="text-sm font-semibold">Cinexa+ CMS</span>
-                </button>
-            </nav>
+        <nav class="flex-1 px-4 space-y-1 overflow-y-auto pt-4">
+            <p class="text-[10px] font-bold text-slate-600 uppercase mb-2 px-4">HQ Command</p>
+            <button onclick="showSection('dashboard')" class="sidebar-item sidebar-active w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-400 transition-all">
+                <i class="fa-solid fa-gauge-high"></i> <span class="text-sm font-semibold">Intelligence</span>
+            </button>
+            <button onclick="showSection('directory')" class="sidebar-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-400 transition-all">
+                <i class="fa-solid fa-address-book"></i> <span class="text-sm font-semibold">Staff Directory</span>
+            </button>
+            <button onclick="showSection('calendar')" class="sidebar-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-400 transition-all">
+                <i class="fa-solid fa-calendar-days"></i> <span class="text-sm font-semibold">Ops Calendar</span>
+            </button>
+            <button onclick="showSection('sandbox')" class="sidebar-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-400 transition-all">
+                <i class="fa-solid fa-vial"></i> <span class="text-sm font-semibold">Approval Sandbox</span>
+            </button>
+            
+            <p class="text-[10px] font-bold text-slate-600 uppercase mt-8 mb-2 px-4">Personal</p>
+            <button onclick="showSection('profile')" class="sidebar-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-400 transition-all">
+                <i class="fa-solid fa-user-gear"></i> <span class="text-sm font-semibold">My Credentials</span>
+            </button>
+        </nav>
 
-            <div class="p-6 bg-[#0a1824] border-t border-white/5 flex items-center gap-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-600/20">H</div>
-                <div class="flex-1 overflow-hidden">
-                    <p class="text-sm font-bold truncate text-white">Haneef Mohammed</p>
-                    <p class="text-[9px] font-bold mono text-blue-400 uppercase tracking-tighter">RANK 10 // CEO</p>
+        <div class="p-4 border-t border-white/5">
+            <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-400/10 rounded-xl transition-all font-bold text-xs uppercase">
+                <i class="fa-solid fa-power-off"></i> Terminate Session
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 glass-panel relative z-40">
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-500/10 text-blue-500 px-3 py-1 rounded-md text-[10px] mono font-bold border border-blue-500/20 uppercase">
+                    Status: Online // Node_Ilorin_01
                 </div>
             </div>
-        </aside>
-
-        <main class="flex-1 flex flex-col overflow-hidden relative">
-            <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 glass">
-                <h2 id="view-title" class="text-lg font-bold tracking-tight">Executive Overview</h2>
-                <div class="flex items-center gap-4">
-                    <div class="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                        <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Node: Ilorin Alpha</span>
-                    </div>
+            
+            <div class="flex items-center gap-8">
+                <div class="relative cursor-pointer" onclick="toggleNotifications()">
+                    <i class="fa-solid fa-bell text-slate-400 hover:text-white transition-colors"></i>
+                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                 </div>
-            </header>
-
-            <section id="content-container" class="flex-1 overflow-y-auto p-10 space-y-8 no-scrollbar">
-                <div id="page-dashboard" class="page-content space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="glass p-6 rounded-3xl"><p class="text-xs font-bold text-slate-500">USERBASE</p><h3 class="text-3xl font-black mono text-white">105.4K</h3></div>
-                        <div class="glass p-6 rounded-3xl border-l-4 border-blue-500"><p class="text-xs font-bold text-slate-500">REVENUE</p><h3 class="text-3xl font-black mono text-blue-500">$12.4M</h3></div>
-                        <div class="glass p-6 rounded-3xl"><p class="text-xs font-bold text-slate-500">LATENCY</p><h3 class="text-3xl font-black mono text-emerald-500">12ms</h3></div>
-                        <div class="glass p-6 rounded-3xl"><p class="text-xs font-bold text-slate-500">STORAGE</p><h3 class="text-3xl font-black mono text-white">2.4 PB</h3></div>
+                <div class="flex items-center gap-3 border-l border-white/10 pl-8">
+                    <div class="text-right">
+                        <p id="nav-user-name" class="text-sm font-bold">---</p>
+                        <p id="nav-user-rank" class="text-[9px] text-blue-400 mono">RANK_--</p>
                     </div>
-                    
-                    <div class="glass p-8 rounded-[2.5rem] min-h-[400px]">
-                        <canvas id="growthChart"></canvas>
-                    </div>
+                    <img id="nav-user-img" src="https://ui-avatars.com/api/?background=3b82f6&color=fff" class="w-10 h-10 rounded-xl border border-white/10 shadow-lg">
                 </div>
+            </div>
+        </header>
 
-                <div id="page-users" class="page-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-2xl font-black text-white">Staff Matrix</h3>
+        <div id="viewport" class="flex-1 overflow-y-auto p-10 space-y-8 no-scrollbar">
+            
+            <section id="sec-dashboard" class="content-sec space-y-8">
+                <h2 class="text-3xl font-extrabold tracking-tight">Intelligence <span class="text-slate-500">Overview</span></h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     </div>
-                    <div class="glass rounded-3xl overflow-hidden">
-                        <table class="w-full text-left">
-                            <thead class="bg-white/5 text-[10px] font-bold text-slate-500 uppercase">
-                                <tr><th class="px-8 py-5">Operator</th><th class="px-8 py-5">Designation</th><th class="px-8 py-5 text-right">Node</th></tr>
-                            </thead>
-                            <tbody class="text-sm">
-                                <tr class="border-t border-white/5"><td class="px-8 py-5 font-bold text-white">Haneef Mohammed</td><td class="px-8 py-5"><span class="role-badge rank-10">CEO</span></td><td class="px-8 py-5 text-right mono text-blue-500">ILORIN_ALPHA</td></tr>
-                            </tbody>
-                        </table>
+            </section>
+
+            <section id="sec-calendar" class="content-sec hidden space-y-6 h-full">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold">Operations <span class="text-blue-500">Calendar</span></h3>
+                    <button class="bg-blue-600 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-blue-500 transition-all">+ Schedule Meeting</button>
+                </div>
+                <div class="glass-panel p-6 rounded-3xl h-[600px]" id="calendar-root"></div>
+            </section>
+
+            <section id="sec-directory" class="content-sec hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold">Global <span class="text-blue-500">Directory</span></h3>
+                    <input type="text" placeholder="Search Matrix..." class="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl text-sm w-80 focus:ring-2 ring-blue-500/50 transition-all">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="directory-list">
+                    </div>
+            </section>
+
+            <section id="sec-sandbox" class="content-sec hidden space-y-6">
+                <h3 class="text-2xl font-bold">Code <span class="text-emerald-500">Sandbox & Approvals</span></h3>
+                <div class="glass-panel p-8 rounded-[2.5rem] border-l-4 border-emerald-500">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <p class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-1">Queue: PR_#992</p>
+                            <h4 class="text-xl font-bold">Push Request: Cinexa Plus Live Sync</h4>
+                        </div>
+                        <div class="flex gap-3">
+                            <button class="bg-emerald-500/10 text-emerald-500 px-6 py-2 rounded-xl text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all">APPROVE</button>
+                            <button class="bg-red-500/10 text-red-500 px-6 py-2 rounded-xl text-xs font-bold hover:bg-red-500 hover:text-white transition-all">REJECT</button>
+                        </div>
+                    </div>
+                    <div class="bg-black/40 rounded-2xl p-6 mono text-xs text-blue-300 border border-white/5">
+                        <pre><code>// approval_logic.js
+if (auth.rank >= 8) {
+  system.deploy('Cinexa_Plus_v4');
+  log.event('CEO_AUTHORIZED_DEPLOY');
+}</code></pre>
                     </div>
                 </div>
             </section>
-        </main>
+
+        </div>
+    </main>
+
+    <div id="notif-panel" class="fixed right-0 top-0 bottom-0 w-80 glass-panel z-[100] translate-x-full transition-transform duration-300 p-8 shadow-2xl">
+        <div class="flex justify-between items-center mb-8">
+            <h5 class="font-bold uppercase tracking-widest text-xs">Signal Intel</h5>
+            <button onclick="toggleNotifications()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="space-y-4">
+            <div class="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
+                <p class="text-[10px] text-blue-500 font-bold uppercase mb-1">System</p>
+                <p class="text-xs text-slate-300">Security Handshake complete for Node: Ilorin Alpha.</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        function showPage(id) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`page-${id}`).classList.remove('hidden');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('sidebar-active'));
+        // NAVIGATION LOGIC
+        function showSection(id) {
+            document.querySelectorAll('.content-sec').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.remove('sidebar-active'));
+            
+            document.getElementById(`sec-${id}`).classList.remove('hidden');
             event.currentTarget.classList.add('sidebar-active');
-            document.getElementById('view-title').innerText = id.charAt(0).toUpperCase() + id.slice(1) + " Overview";
+
+            if(id === 'calendar') {
+                setTimeout(() => renderCalendar(), 100);
+            }
         }
 
-        window.onload = () => {
-            const ctx = document.getElementById('growthChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Growth',
-                        data: [12000, 19000, 30000, 45000, 70000, 105000],
-                        borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 3,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
-                        x: { grid: { display: false }, ticks: { color: '#64748b' } }
-                    }
-                }
+        // CALENDAR INITIALIZATION
+        function renderCalendar() {
+            var calendarEl = document.getElementById('calendar-root');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                themeSystem: 'standard',
+                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+                events: [
+                    { title: 'Launch Party Prep', start: '2026-04-18', color: '#3b82f6' },
+                    { title: 'Executive Board Call', start: '2026-04-20T10:00:00', color: '#10b981' }
+                ]
             });
-        };
+            calendar.render();
+        }
+
+        function toggleNotifications() {
+            const panel = document.getElementById('notif-panel');
+            panel.classList.toggle('translate-x-full');
+        }
+
+        function logout() {
+            if(confirm("Terminate H.E.M. CORE session?")) {
+                window.location.reload(); 
+            }
+        }
     </script>
 </body>
 </html>
