@@ -1,21 +1,37 @@
 name: H.E.M. Core Auto-Deploy
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to AWS EC2 via SSH
+      - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@master
         with:
           host: 18.168.21.127
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # 1. Navigate to directory
             cd /var/www/hem-cloud
-            git fetch origin main
-            git reset --hard origin/main
+            
+            # 2. Fix Git ownership and Force Sync
+            sudo git config --global --add safe.directory /var/www/hem-cloud
+            sudo git fetch origin main
+            sudo git reset --hard origin/main
+            
+            # 3. Clean up the folder to prevent Nginx confusion
+            # This ensures index.html is the real one and removes any old debian defaults
+            sudo rm -f index.nginx-debian.html
+            
+            # 4. Set final permissions
             sudo chown -R www-data:www-data /var/www/hem-cloud
+            sudo chmod -R 755 /var/www/hem-cloud
+            
+            # 5. Force Nginx to reload everything
+            sudo systemctl reload nginx
             sudo systemctl restart nginx
