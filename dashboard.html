@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H.E.M. | DEEP VOID</title>
+    <title>H.E.M. EXECUTIVE | OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,185 +11,183 @@
     <style>
         :root { 
             --void: #000000; 
-            --accent: #2563eb; 
-            --glass: rgba(255, 255, 255, 0.02);
-            --border: rgba(255, 255, 255, 0.05);
+            --apple-gray: #1c1c1e;
+            --accent: #007aff; /* Apple Blue */
+            --glass: rgba(28, 28, 30, 0.6);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         body { 
-            background-color: var(--void); 
+            background: linear-gradient(135deg, #000000 0%, #0a0a0b 100%);
             color: #ffffff; 
-            font-family: 'Inter', sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
             overflow: hidden; 
-        }
-
-        /* DEEP VOID GLASS */
-        .glass-panel { 
-            background: var(--glass);
-            backdrop-filter: blur(40px);
-            border: 1px solid var(--border);
-            border-radius: 3rem;
-            transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        .glass-panel:hover {
-            border-color: rgba(37, 99, 235, 0.3);
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        /* CENTERED LAYOUT ENGINE */
-        .app-container {
-            display: grid;
-            grid-template-columns: 320px 1fr;
             height: 100vh;
-            width: 100vw;
-            padding: 2rem;
-            gap: 2rem;
         }
 
-        /* INVISIBLE ELEMENTS */
+        /* TACTICAL OS PANELS */
+        .os-sidebar { width: 260px; background: var(--glass); backdrop-filter: blur(50px); border-right: 0.5px solid var(--border); }
+        .os-inspector { width: 300px; background: var(--glass); backdrop-filter: blur(50px); border-left: 0.5px solid var(--border); }
+        
+        .glass-widget { 
+            background: rgba(255, 255, 255, 0.04);
+            border: 0.5px solid var(--border);
+            border-radius: 22px; /* Apple Standard Widget Radius */
+            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .glass-widget:hover { background: rgba(255, 255, 255, 0.08); transform: scale(1.02); }
+
+        /* OS TYPOGRAPHY & BUTTONS */
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+            border-radius: 10px; color: #a1a1a6; font-size: 13px; font-weight: 500;
+            transition: 0.2s;
+        }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
+        .nav-item.active { background: var(--accent); color: #fff; }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .nav-link { 
-            opacity: 0.3; 
-            transition: 0.4s; 
-            letter-spacing: 0.2em;
-        }
-
-        .nav-link:hover, .nav-link.active { 
-            opacity: 1; 
-            text-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
-        }
-
-        .chart-container { position: relative; height: 100%; width: 100%; }
     </style>
 </head>
-<body class="no-scrollbar">
+<body class="flex">
 
-    <div class="app-container">
-        
-        <aside class="glass-panel flex flex-col p-12">
-            <div class="mb-20 text-center">
-                <h1 class="text-3xl font-black italic tracking-tighter">H.E.M.</h1>
-                <p class="text-[9px] font-bold text-blue-500 uppercase tracking-[0.5em] mt-2">Deep Void OS</p>
+    <aside class="os-sidebar flex flex-col p-6">
+        <div class="flex items-center gap-3 mb-10 px-2">
+            <div class="w-9 h-9 bg-gradient-to-tr from-blue-600 to-blue-400 rounded-xl shadow-lg flex items-center justify-center font-bold text-lg italic">H</div>
+            <div>
+                <h1 class="text-sm font-bold tracking-tight">H.E.M. CORE</h1>
+                <p class="text-[10px] text-slate-500 font-medium">Executive Terminal</p>
             </div>
+        </div>
 
-            <nav class="flex-1 space-y-12">
-                <button onclick="nav('ops')" class="nav-link active w-full text-left text-[11px] font-black uppercase italic flex items-center gap-4">
-                    <span class="w-1 h-1 bg-blue-500 rounded-full"></span> Operations
-                </button>
-                <button onclick="nav('monetag')" class="nav-link w-full text-left text-[11px] font-black uppercase italic flex items-center gap-4">
-                    <span class="w-1 h-1 bg-slate-700 rounded-full"></span> Monetag
-                </button>
-                <button onclick="nav('infra')" class="nav-link w-full text-left text-[11px] font-black uppercase italic flex items-center gap-4">
-                    <span class="w-1 h-1 bg-slate-700 rounded-full"></span> Cloud Infrastructure
-                </button>
-            </nav>
+        <nav class="flex-1 space-y-1">
+            <p class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Mainframe</p>
+            <button onclick="nav('ops')" class="nav-item active w-full"><i class="fa-solid fa-chart-pie"></i> Overview</button>
+            <button onclick="nav('rev')" class="nav-item w-full"><i class="fa-solid fa-dollar-sign"></i> Revenue</button>
+            <button onclick="nav('nodes')" class="nav-item w-full"><i class="fa-solid fa-server"></i> Nodes</button>
+        </nav>
 
-            <div class="mt-auto pt-10 border-t border-white/5 text-center">
-                <p class="text-[10px] font-bold text-slate-500 uppercase mb-4">CEO Clearance</p>
-                <button onclick="logout()" class="text-[9px] font-black text-red-500 uppercase tracking-widest hover:opacity-50">Disconnect</button>
-            </div>
-        </aside>
-
-        <main class="flex flex-col gap-8 no-scrollbar overflow-y-auto">
-            
-            <header class="flex justify-between items-end px-4">
-                <div>
-                    <h2 id="view-title" class="text-4xl font-black italic uppercase tracking-tighter">Global Mainframe</h2>
-                    <p class="text-[10px] text-slate-500 font-bold uppercase mt-2 tracking-widest">Real-time AWS & Monetag Synchronization</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest animate-pulse">● System_Nominal</p>
-                </div>
-            </header>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="glass-panel p-10">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-4">Yield (24H)</p>
-                    <h3 id="stat-rev" class="text-4xl font-black text-blue-500">$1,330.34</h3>
-                </div>
-                <div class="glass-panel p-10">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-4">RDS Node Load</p>
-                    <h3 id="stat-cpu" class="text-4xl font-black text-white">4.2%</h3>
-                </div>
-                <div class="glass-panel p-10">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-4">Live Traffic</p>
-                    <h3 id="stat-traffic" class="text-4xl font-black text-white">1,240</h3>
+        <div class="mt-auto p-2">
+            <div class="glass-widget p-4 bg-blue-600/10 border-blue-500/20">
+                <p class="text-[9px] font-black text-blue-400 uppercase">System Status</p>
+                <div class="flex items-center justify-between mt-1">
+                    <span class="text-xs font-bold">Encrypted</span>
+                    <i class="fa-solid fa-lock text-[10px] text-blue-400"></i>
                 </div>
             </div>
+        </div>
+    </aside>
 
-            <div class="glass-panel p-12 flex-1 min-h-[500px]">
-                <div class="flex justify-between items-center mb-10">
-                    <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 italic">Network Throughput Visualization</h4>
-                    <div class="flex gap-4">
-                        <span class="text-[9px] font-bold py-1 px-3 border border-white/10 rounded-full">AWS RDS</span>
-                        <span class="text-[9px] font-bold py-1 px-3 border border-blue-500/50 text-blue-500 rounded-full">TRAFFIC</span>
+    <main class="flex-1 flex flex-col overflow-y-auto no-scrollbar bg-black/20">
+        <header class="h-20 flex items-center justify-between px-10">
+            <h2 id="view-title" class="text-2xl font-semibold tracking-tight">System Overview</h2>
+            <div class="flex items-center gap-4 text-xs font-medium text-slate-400">
+                <span>April 17, 2026</span>
+                <span class="w-1 h-1 bg-slate-700 rounded-full"></span>
+                <span class="text-emerald-500">Live Feedback</span>
+            </div>
+        </header>
+
+        <div class="px-10 pb-10 space-y-8">
+            <div class="grid grid-cols-2 gap-6">
+                <div class="glass-widget p-8">
+                    <p class="text-[11px] font-bold text-slate-500 uppercase">Global Revenue</p>
+                    <h3 class="text-4xl font-semibold mt-2 tabular-nums">$1,330.34</h3>
+                    <div class="mt-4 flex items-center gap-2 text-emerald-500 text-[11px] font-bold">
+                        <i class="fa-solid fa-arrow-up"></i> 12.4% vs last cycle
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="voidChart"></canvas>
+                <div class="glass-widget p-8">
+                    <p class="text-[11px] font-bold text-slate-500 uppercase">Compute Intensity</p>
+                    <h3 id="cpu-load" class="text-4xl font-semibold mt-2 tabular-nums">4.2%</h3>
+                    <div class="mt-4 w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                        <div id="cpu-bar" class="bg-blue-500 h-full transition-all duration-1000" style="width: 42%"></div>
+                    </div>
                 </div>
             </div>
 
-        </main>
-    </div>
+            <div class="glass-widget p-10 h-[450px]">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="font-bold text-sm tracking-tight">Network Activity</h4>
+                    <select class="bg-transparent text-xs font-bold text-blue-500 outline-none">
+                        <option>Real-time (Live)</option>
+                        <option>Last 24 Hours</option>
+                    </select>
+                </div>
+                <div class="h-full pb-10">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <aside class="os-inspector flex flex-col p-8">
+        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Security Inspector</h3>
+        
+        <div class="space-y-6">
+            <div class="glass-widget p-5 space-y-3">
+                <p class="text-[10px] font-bold text-slate-400">Active Node</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black">eu-west-2-primary</span>
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                </div>
+            </div>
+
+            <div class="glass-widget p-5 space-y-4">
+                <p class="text-[10px] font-bold text-slate-400">Recent Logs</p>
+                <div class="space-y-3 text-[10px] font-medium mono">
+                    <p class="text-blue-400">> RDS Auth Success</p>
+                    <p class="text-slate-500">> CDN Cache Purged</p>
+                    <p class="text-slate-500">> Cognito Session Refresh</p>
+                </div>
+            </div>
+
+            <div class="p-2">
+                <button onclick="logout()" class="w-full py-3 glass-widget bg-red-500/10 border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
+                    System Shutdown
+                </button>
+            </div>
+        </div>
+    </aside>
 
     <script>
-        // --- DATA HUB ---
-        function nav(id) {
-            const titles = { 'ops': 'Global Mainframe', 'monetag': 'Ad Performance', 'infra': 'AWS Cluster' };
-            document.getElementById('view-title').innerText = titles[id];
-            
-            // Animation reset
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        }
-
-        // --- GRAPH ENGINE ---
-        const ctx = document.getElementById('voidChart').getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(37, 99, 235, 0.2)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-        const voidChart = new Chart(ctx, {
+        // Chart Logic
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        const mainChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: Array(24).fill(''),
+                labels: Array(12).fill(''),
                 datasets: [{
-                    label: 'Throughput',
-                    data: [30, 45, 32, 70, 85, 60, 90, 120, 110, 150, 140, 180, 170, 210, 200, 250, 230, 280, 260, 310, 290, 340, 320, 400],
-                    borderColor: '#2563eb',
-                    borderWidth: 4,
-                    pointRadius: 0,
+                    data: [65, 59, 80, 81, 56, 55, 40, 70, 90, 110, 105, 130],
+                    borderColor: '#007aff',
+                    borderWidth: 3,
                     tension: 0.4,
+                    pointRadius: 0,
                     fill: true,
-                    backgroundColor: gradient
+                    backgroundColor: (context) => {
+                        const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
+                        gradient.addColorStop(0, 'rgba(0, 122, 255, 0.1)');
+                        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                        return gradient;
+                    }
                 }]
             },
             options: {
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: {
-                    x: { display: false },
-                    y: { 
-                        grid: { color: 'rgba(255,255,255,0.02)', drawBorder: false },
-                        ticks: { color: '#475569', font: { weight: 'bold', size: 10 } }
-                    }
+                scales: { 
+                    x: { display: false }, 
+                    y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#475569', font: { size: 10 } } } 
                 }
             }
         });
 
-        // --- LIVE UPDATES ---
+        // Live CPU Simulation
         setInterval(() => {
-            const cpu = (Math.random() * (6 - 3) + 3).toFixed(1);
-            document.getElementById('stat-cpu').innerText = `${cpu}%`;
-            
-            // Update chart data point
-            voidChart.data.datasets[0].data.shift();
-            voidChart.data.datasets[0].data.push(Math.floor(Math.random() * (400 - 300) + 300));
-            voidChart.update('none');
+            const cpu = (Math.random() * (8 - 3) + 3).toFixed(1);
+            document.getElementById('cpu-load').innerText = `${cpu}%`;
+            document.getElementById('cpu-bar').style.width = `${cpu * 10}%`;
         }, 3000);
 
         function logout() {
